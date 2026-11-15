@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="ChartManager.csproj" />
+  <Project Path="ChartManager.csproj">
+    <BuildType Project="Release" />
+  </Project>
 </Solution>
