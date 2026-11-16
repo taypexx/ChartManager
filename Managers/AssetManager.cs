@@ -23,7 +23,7 @@ namespace ChartManager.Managers
             ImageAssets.Add(name, imageAsset);
 
             GameObject go = new(name);
-            go.transform.parent = AssetHolder.transform;
+            go.transform.SetParent(AssetHolder.transform);
             go.AddComponent<Image>().sprite = imageAsset.Sprite;
         }
 

@@ -1,4 +1,4 @@
-﻿using ChartManager.Static;
+﻿using ChartManager.Managers;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.Managers;
 using UnityEngine;
@@ -10,12 +10,12 @@ namespace ChartManager.UI.Buttons
 {
     internal abstract class CustomButton
     {
-        protected static Sprite RoundedSquare = Addressables.LoadAssetAsync<Sprite>("SprRoundedsquare").WaitForCompletion();
-        protected GameObject GameObject;
-        protected RectTransform Rect;
+        private static Sprite RoundedSquare = Addressables.LoadAssetAsync<Sprite>("SprRoundedsquare").WaitForCompletion();
+        internal GameObject GameObject;
+        internal RectTransform Rect;
 
-        protected Image BaseImage;
-        protected Button Button;
+        internal Image BaseImage;
+        internal Button Button;
 
         internal void Update(Color baseColor)
         {
@@ -51,7 +51,7 @@ namespace ChartManager.UI.Buttons
             BaseImage.type = Image.Type.Tiled;
 
             Button = GameObject.AddComponent<Button>();
-            Button.onClick.AddListener(new Action(() => Singleton<AudioManager>.instance.PlayButtonClickedSfx(ClickSfxType.Click)));
+            Button.onClick.AddListener(new Action(SoundManager.PlayClick));
             if (onClick != null) Button.onClick.AddListener((UnityAction)onClick);
         }
     }

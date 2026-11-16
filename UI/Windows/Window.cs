@@ -5,29 +5,37 @@ using PopupLib.UI.Windows;
 using PopupLib.UI.Windows.Abstract;
 using ChartManager.Data;
 using ChartManager.Managers;
+using ChartManager.UI.Extensions;
 
-namespace ChartManager.UI
+namespace ChartManager.UI.Windows
 {
     internal abstract class Window
     {
-        internal LocalString Title { get; set; }
+        internal LocalString Title { get; private set; }
+        internal LocalString Content { get; private set; }
         internal ForumWindow Base { get; private set; }
-
-        internal ImageAsset Banner { get; private set; }
+        internal bool HasBackButton { get; private set; }
         internal Dictionary<ForumObject, object> ButtonsWindows { get; private set; }
+        internal ImageAsset Banner { get; private set; }
+
+        protected void UpdateContent(string text)
+        {
+            Content = new(text);
+            foreach (var button in Base.ForumObjects)
+            {
+                button.Contents = Content;
+            }
+        }
 
         /// <summary>
         /// Adds a new button to the window.
         /// </summary>
         /// <param name="name">Text to be displayed on the button.</param>
         /// <param name="windowToOpen">(Optional) Window to open when the button is pressed.</param>
-        /// <param name="content">(Optional) Text to be displayed in the frame.</param>
         /// <returns>A new button.</returns>
-        protected ForumObject AddButton(string name, object? windowToOpen = null, string? content = null)
+        protected ForumObject AddButton(string name, object? windowToOpen = null)
         {
-            if (content == null) content = string.Empty;
-
-            ForumObject button = new(new(name), new(content));
+            ForumObject button = new(new(name), Content);
             if (Banner != null)
             {
                 button.Texture = Banner.Texture;
@@ -49,7 +57,11 @@ namespace ChartManager.UI
             return Base.ForumObjects.Remove(button) && ButtonsWindows.Remove(button);
         }
 
-        internal void Show() => Base.Show();
+        internal void Show()
+        {
+            BulletinExtension.BackButton.gameObject.SetActive(HasBackButton);
+            Base.Show();
+        }
 
         internal void Close() => Base.ForceClose();
 
@@ -59,7 +71,7 @@ namespace ChartManager.UI
             Base.Show();
         }
 
-        protected virtual void OnClick(PopupLib.UI.Windows.Interfaces.IListWindow _, int objectIndex)
+        internal virtual void OnClick(PopupLib.UI.Windows.Interfaces.IListWindow _, int objectIndex)
         {
             if (!Base.Activated) return;
             ForumObject button = Base.ForumObjects[objectIndex];
@@ -81,7 +93,7 @@ namespace ChartManager.UI
             }
         }
 
-        protected virtual void OnShow(BaseWindow _)
+        protected void OnShow(BaseWindow _)
         {
             if (Title != null)
             {
@@ -91,7 +103,7 @@ namespace ChartManager.UI
             BulletinExtension.Toggle(true);
         }
 
-        protected virtual void OnClose(BaseWindow _)
+        protected void OnClose(BaseWindow _)
         {
             BulletinExtension.CurrentWindow = null;
             BulletinExtension.Toggle(false);
@@ -102,9 +114,13 @@ namespace ChartManager.UI
         /// </summary>
         /// <param name="title">Title of the window.</param>
         /// <param name="bannerName">(Optional) Path of the banner image asset.</param>
-        internal Window(string title, string? bannerName = null)
+        internal Window(string title, string? bannerName = null, bool hasBackButton = true)
         {
             Title = new(title);
+            Content = new();
+            HasBackButton = hasBackButton;
+            ButtonsWindows = new();
+
             if (bannerName != null)
             {
                 Banner = AssetManager.GetImageAsset("Banners." + bannerName);

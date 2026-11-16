@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using ChartManager.Managers;
 using ChartManager.Static;
-using ChartManager.UI;
 using MelonLoader;
 
 namespace ChartManager
@@ -10,8 +9,9 @@ namespace ChartManager
     {
         public const string ModName = "ChartManager";
         public const string ModDescription = "A mod that lets you find, delete and create charts through muse dash.";
-        public const string Version = "0.1.0";
+        public const string Version = "1.0.0";
         public const string Author = "taypexx";
+        private static readonly string[] Dependencies = { "CustomAlbums", "LocalizeLib", "PopupLib" };
 
         internal static Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
         internal static string CurrentScene { get; private set; }
@@ -23,7 +23,7 @@ namespace ChartManager
             switch (CurrentScene)
             {
                 case "UISystem_PC":
-                    UIManager.Load();
+                    UIManager.BuildUI();
                     break;
                 case "GameMain":
                     break;
@@ -33,11 +33,29 @@ namespace ChartManager
         public override void OnLateInitializeMelon()
         {
             AssetManager.Init();
+            UIManager.BuildWindows();
+
+            // Creating infos after all albums were loaded
+            MainManager.InitCharts();
         }
 
         public override void OnInitializeMelon()
         {
-            Log.Info("ChartManager initialized successfully.");
+            // Checking dependencies
+            foreach (var dependencyName in Dependencies)
+            {
+                if (!RegisteredMelons.Any(m => m.Info.Name == dependencyName))
+                {
+                    Log.Error($"{dependencyName} dependency is missing!");
+                }
+            }
+
+            SystemManager.CreateMainFolder();
+        }
+
+        public override void OnDeinitializeMelon()
+        {
+            SystemManager.Cleanup();
         }
     }
 }

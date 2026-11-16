@@ -1,5 +1,6 @@
 ﻿using Il2CppSirenix.Serialization.Utilities;
 using System.Diagnostics;
+using System.IO.Compression;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -8,6 +9,14 @@ namespace ChartManager.Static
     internal static class Utils
     {
         public static Font NormalFont = Addressables.LoadAssetAsync<Font>("Normal").WaitForCompletion();
+
+        public static ZipArchive GetNestedZip(this ZipArchive mdp, string entryName)
+        {
+            var mdm = mdp.GetEntry(entryName) ?? throw new ArgumentException($"Entry {entryName} not found.");
+            var mdmStream = mdm.Open();
+            var openedMdm = new ZipArchive(mdmStream, ZipArchiveMode.Read, false);
+            return openedMdm;
+        }
 
         /// <summary>
         /// Rounds the <paramref name="value"/> to 2 decimal places.

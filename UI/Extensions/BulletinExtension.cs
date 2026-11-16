@@ -1,10 +1,11 @@
 ﻿using ChartManager.Managers;
 using ChartManager.Static;
+using ChartManager.UI.Windows;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace ChartManager.UI
+namespace ChartManager.UI.Extensions
 {
     internal static class BulletinExtension
     {
