@@ -5,7 +5,6 @@ using PopupLib.UI.Windows;
 using PopupLib.UI.Windows.Abstract;
 using ChartManager.Data;
 using ChartManager.Managers;
-using ChartManager.Static;
 
 namespace ChartManager.UI
 {
@@ -14,7 +13,6 @@ namespace ChartManager.UI
         internal LocalString Title { get; set; }
         internal ForumWindow Base { get; private set; }
 
-        internal string InitialBannerAssetName { get; private set; }
         internal ImageAsset Banner { get; private set; }
         internal Dictionary<ForumObject, object> ButtonsWindows { get; private set; }
 
@@ -110,7 +108,6 @@ namespace ChartManager.UI
             if (bannerName != null)
             {
                 Banner = AssetManager.GetImageAsset("Banners." + bannerName);
-                InitialBannerAssetName = bannerName;
             }
 
             Base = new();

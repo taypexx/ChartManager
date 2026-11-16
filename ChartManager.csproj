@@ -25,6 +25,8 @@
   <ItemGroup>
     <None Remove="Assets\Icons\Back.png" />
     <None Remove="Assets\Icons\Cross.png" />
+    <None Remove="Assets\Icons\List.png" />
+    <None Remove="Assets\Icons\Pen.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +36,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Assets\Icons\Back.png" />
     <EmbeddedResource Include="Assets\Icons\Cross.png" />
+    <EmbeddedResource Include="Assets\Icons\List.png" />
+    <EmbeddedResource Include="Assets\Icons\Pen.png" />
   </ItemGroup>
 
   <ItemGroup>
