@@ -12,6 +12,7 @@ namespace ChartManager.Managers
         internal static PnlStage PnlStage => GameObject.Find("UI/Standerd/PnlStage").GetComponent<PnlStage>();
 
         internal static ChartWindow ChartWindow;
+        internal static MapsWindow MapsWindow;
 
         /// <summary>
         /// Loads the UI when the main UI scene loads.
@@ -25,6 +26,10 @@ namespace ChartManager.Managers
         internal static void BuildWindows()
         {
             ChartWindow = new();
+            MapsWindow = new();
+
+            ChartWindow.CreateButtons();
+            MapsWindow.CreateButtons();
         }
     }
 }

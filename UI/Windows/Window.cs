@@ -11,7 +11,7 @@ namespace ChartManager.UI.Windows
 {
     internal abstract class Window
     {
-        internal LocalString Title { get; private set; }
+        internal LocalString Title { get; set; }
         internal LocalString Content { get; private set; }
         internal ForumWindow Base { get; private set; }
         internal bool HasBackButton { get; private set; }
@@ -24,6 +24,16 @@ namespace ChartManager.UI.Windows
             foreach (var button in Base.ForumObjects)
             {
                 button.Contents = Content;
+            }
+        }
+
+        internal abstract void CreateButtons();
+
+        protected void RemoveButtons()
+        {
+            foreach (var button in Base.ForumObjects)
+            {
+                RemoveButton(button);
             }
         }
 
@@ -57,16 +67,16 @@ namespace ChartManager.UI.Windows
             return Base.ForumObjects.Remove(button) && ButtonsWindows.Remove(button);
         }
 
-        internal void Show()
-        {
-            BulletinExtension.BackButton.gameObject.SetActive(HasBackButton);
-            Base.Show();
-        }
+        internal virtual void Show() => Base.Show();
 
-        internal void Close() => Base.ForceClose();
+        internal virtual void Close() => Base.ForceClose();
 
         internal virtual void Refresh()
         {
+            /* Might be:
+            Close();
+            Show();
+            */
             Base.ForceClose();
             Base.Show();
         }
@@ -93,20 +103,14 @@ namespace ChartManager.UI.Windows
             }
         }
 
-        protected void OnShow(BaseWindow _)
+        internal virtual void OnShow(BaseWindow _)
         {
-            if (Title != null)
-            {
-                BulletinExtension.Title.text = Title.ToString();
-            }
-            BulletinExtension.CurrentWindow = this;
-            BulletinExtension.Toggle(true);
+            BulletinExtension.SetWindow(this, Title.ToString(), HasBackButton);
         }
 
-        protected void OnClose(BaseWindow _)
+        internal virtual void OnClose(BaseWindow _)
         {
-            BulletinExtension.CurrentWindow = null;
-            BulletinExtension.Toggle(false);
+            BulletinExtension.CloseWindow();
         }
 
         /// <summary>

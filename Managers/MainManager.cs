@@ -8,6 +8,20 @@ namespace ChartManager.Managers
     {
         internal static Dictionary<string, Chart> Charts = new();
 
+        internal static void SaveChart(Chart chart)
+        {
+            // TODO: save assets
+
+            chart.Info.SaveToAlbum();
+
+            foreach (var (_,map) in chart.Maps)
+            {
+                map.SaveToAlbum();
+            }
+
+            if (chart.HasCinema) chart.Cinema.SaveToAlbum();
+        }
+
         internal static void InitCharts()
         {
             foreach (var (albumName, album) in AlbumManager.LoadedAlbums)

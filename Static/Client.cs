@@ -4,7 +4,7 @@
     {
         private static HttpClient Http = new();
 
-        internal static async Task<HttpResponseMessage?> GetAsync(string address)
+        internal static async Task<HttpResponseMessage?> GetAsync(string address, bool logErrors = true)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, address);
             var response = await Http.SendAsync(request);
@@ -16,7 +16,7 @@
             }
             else
             {
-                Log.Error($"[{(int)response.StatusCode}] GET request failed: {await response.Content.ReadAsStringAsync()}");
+                if (logErrors) Log.Error($"[{(int)response.StatusCode}] GET request failed: {await response.Content.ReadAsStringAsync()}");
                 return null;
             }
         }

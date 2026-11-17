@@ -3,6 +3,7 @@ using ChartManager.Static;
 using ChartManager.UI.Windows;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.TestTools;
 using UnityEngine.UI;
 
 namespace ChartManager.UI.Extensions
@@ -14,19 +15,43 @@ namespace ChartManager.UI.Extensions
         internal static GameObject ImageBase => GameObject.Find($"{BulletinPath}/ImgBase");
         internal static Image BannerImage => GameObject.Find($"{BulletinPath}/ImgBase/ScrollView/Viewport/Content/Image").GetComponent<Image>();
 
-        internal static Window CurrentWindow { get; set; }
+        internal static Window CurrentWindow { get; private set; }
+        internal static Window PreviousWindow { get; private set; }
 
         internal static Text Title { get; private set; }
         internal static Button BackButton { get; private set; }
         internal static Button ExitButton { get; private set; }
+        internal static Image CoverImage { get; private set; }
 
-        /// <summary>
-        /// Enables/disables the extension.
-        /// </summary>
-        internal static void Toggle(bool state)
+        internal static void SetWindow(Window window, string title, bool hasBackButton)
+        {
+            PreviousWindow = CurrentWindow;
+
+            Title.text = title;
+            Toggle(true, hasBackButton);
+
+            CurrentWindow = window;
+        }
+
+        internal static void CloseWindow()
+        {
+            CurrentWindow = null;
+            Toggle(false);
+        }
+
+        internal static void ToggleCover(bool state, Sprite cover = null)
+        {
+            CoverImage.gameObject.SetActive(state);
+            if (cover != null)
+            {
+                CoverImage.sprite = cover;
+            }
+        }
+
+        internal static void Toggle(bool state, bool enableBackButton = true)
         {
             Title.gameObject.SetActive(state);
-            BackButton.gameObject.SetActive(state);
+            BackButton.gameObject.SetActive(state && enableBackButton);
             ExitButton.gameObject.SetActive(state);
         }
 
@@ -93,6 +118,20 @@ namespace ChartManager.UI.Extensions
                 if (CurrentWindow == null) return;
                 CurrentWindow.Close();
             }));
+
+            var coverGameObject = new GameObject("Cover");
+            var coverRect = coverGameObject.AddComponent<RectTransform>();
+            coverRect.SetParent(ImageBase.transform.Find("ScrollView/Viewport/Content/Image"));
+
+            var coverPivot = new Vector2(0f, 0.5f);
+            coverRect.pivot = coverPivot;
+            coverRect.anchorMin = coverPivot;
+            coverRect.anchorMax = coverPivot;
+            coverRect.localScale = Vector3.one;
+            coverRect.sizeDelta = new(200f, 200f);
+            coverRect.anchoredPosition3D = new(20f, 0f, 0f);
+
+            CoverImage = coverGameObject.AddComponent<Image>();
         }
     }
 }

@@ -2,6 +2,7 @@
 using ChartManager.Managers;
 using ChartManager.Static;
 using MelonLoader;
+using Multiplayer.Static;
 
 namespace ChartManager
 {
@@ -51,6 +52,11 @@ namespace ChartManager
             }
 
             SystemManager.CreateMainFolder();
+        }
+
+        public override void OnUpdate()
+        {
+            Dispatcher.Update();
         }
 
         public override void OnDeinitializeMelon()

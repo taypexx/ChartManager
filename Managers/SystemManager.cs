@@ -1,6 +1,8 @@
 ﻿using ChartManager.Static;
 using CustomAlbums.Albums;
 using CustomAlbums.Data;
+using Il2Cpprail;
+using MelonLoader.ICSharpCode.SharpZipLib.GZip;
 using System.IO.Compression;
 using System.Windows.Forms;
 
@@ -15,8 +17,8 @@ namespace ChartManager.Managers
     {
         private static Dictionary<FormatGroup, string> FormatGroupDescriptions = new()
         {
-            [FormatGroup.All] = "Chart files (cover.png;cover.gif;demo.ogg;demo.mp3;music.ogg;music.mp3;map?.bms;info.json;map?.talk;cinema.json;*.mp4)|cover.png;cover.gif;demo.ogg;demo.mp3;music.ogg;music.mp3;map?.bms;info.json;map?.talk;cinema.json;*.mp4",
-            [FormatGroup.Cover] = "Cover file (cover.png;cover.gif)|cover.png;cover.gif",
+            [FormatGroup.All] = "Chart files (cover.png;demo.ogg;demo.mp3;music.ogg;music.mp3;map?.bms;info.json;map?.talk;cinema.json;*.mp4)|cover.png;demo.ogg;demo.mp3;music.ogg;music.mp3;map?.bms;info.json;map?.talk;cinema.json;*.mp4",
+            [FormatGroup.Cover] = "Cover file (cover.png)|cover.png",
             [FormatGroup.Demo] = "Demo file (demo.ogg;demo.mp3)|demo.ogg;demo.mp3",
             [FormatGroup.Music] = "Music file (music.ogg;music.mp3)|music.ogg;music.mp3",
             [FormatGroup.Map] = "Map file (map?.bms)|map?.bms",
@@ -27,6 +29,21 @@ namespace ChartManager.Managers
         };
 
         private static DirectoryInfo MainDirectory;
+        private static readonly string HitsoundsPath = $"{Main.ModName}.Assets.Template.WAVs.";
+
+        internal static void CopyHitsounds(DirectoryInfo folder)
+        {
+
+            foreach (var resourceName in Main.CurrentAssembly.GetManifestResourceNames().Where(n => n.StartsWith(HitsoundsPath)))
+            {
+                using var stream = Main.CurrentAssembly.GetManifestResourceStream(resourceName);
+                if (stream == null) continue;
+
+                byte[] wav = new byte[] { };
+                stream.Read(wav);
+                File.WriteAllBytes(Path.Combine(folder.FullName, resourceName.Substring(HitsoundsPath.Length)), wav);
+            }
+        }
 
         /// <returns>Path of the folder containing album files.</returns>
         internal static DirectoryInfo? CopyAlbumFiles(Album album)
@@ -42,7 +59,7 @@ namespace ChartManager.Managers
                         break;
                     case PackAlbum:
                         var mdp = ZipFile.OpenRead(album.Path);
-                        var openedMdm = Utils.GetNestedZip(mdp, ((PackAlbum)album).PackAlbumName + ".mdm");
+                        var openedMdm = Utils.GetNestedZip(mdp, ((PackAlbum)album).PackAlbumName + ".mdm", ZipArchiveMode.Read);
                         openedMdm.ExtractToDirectory(folder.FullName, overwriteFiles: true);
                         break;
                     case FolderAlbum:
@@ -64,6 +81,50 @@ namespace ChartManager.Managers
                 Log.Error($"Failed to copy album files of the {album.AlbumName}: {ex}");
             }
             return null;
+        }
+
+        private static void WriteToZip(ZipArchive zip, string fileName, string data)
+        {
+            var entry = zip.GetEntry(fileName);
+            using (var writer = new StreamWriter(entry.Open()))
+            {
+                writer.Write(data);
+            }
+        }
+
+        internal static void WriteToAlbum(Album album, string fileName, string data)
+        {
+            try
+            {
+                switch (album)
+                {
+                    case ArchiveAlbum:
+                        using (var mdm = ZipFile.Open(album.Path, ZipArchiveMode.Update))
+                        {
+                            WriteToZip(mdm, fileName, data);
+                        }
+                        break;
+                    case PackAlbum:
+                        using (var mdp = ZipFile.Open(album.Path, ZipArchiveMode.Update))
+                        {
+                            using (var mdm = Utils.GetNestedZip(mdp, ((PackAlbum)album).PackAlbumName + ".mdm", ZipArchiveMode.Update))
+                            {
+                                WriteToZip(mdm, fileName, data);
+                            }
+                        }
+                        break;
+                    case FolderAlbum:
+                        var path = Path.Combine(album.Path, fileName);
+                        File.WriteAllText(path, data);
+                        break;
+                    default:
+                        throw new Exception("Unknown album type.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Failed to write {fileName} to the {album.AlbumName}: {ex}");
+            }
         }
 
         internal static string? SelectFile(FormatGroup[] formats)
