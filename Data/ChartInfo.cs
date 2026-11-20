@@ -21,14 +21,9 @@ namespace ChartManager.Data
         internal string Author;
         internal string BPM;
         internal string[] Tags;
-        internal string LevelDesigner;
-        internal string[] LevelDesigners;
-        internal string LevelDesigner1;
-        internal string LevelDesigner2;
-        internal string LevelDesigner3;
-        internal string LevelDesigner4;
-        internal string LevelDesigner5;
-        internal 
+        internal Dictionary<byte, string> LevelDesigners;
+        internal Dictionary<byte,string> Difficulties;
+
         internal Scene BaseScene;
         internal SceneEgg.SceneEggs SceneEgg;
         internal HiddenUnlockMethod HiddenUnlockMethod;
@@ -45,17 +40,17 @@ namespace ChartManager.Data
                 ["bpm"] = BPM,
                 ["scene"] = $"scene_{((byte)BaseScene).ToString("D2")}",
                 ["searchTags"] = new JsonArray(Tags.Select(t => JsonValue.Create(t)).ToArray()),
-                ["levelDesigner"] = LevelDesigner,
-                ["levelDesigner1"] = LevelDesigner1,
-                ["levelDesigner2"] = LevelDesigner2,
-                ["levelDesigner3"] = LevelDesigner3,
-                ["levelDesigner4"] = LevelDesigner4,
-                ["levelDesigner5"] = LevelDesigner5,
-                ["difficulty1"] = map1 != null ? map1.Level : "0",
-                ["difficulty2"] = map2 != null ? map2.Level : "0",
-                ["difficulty3"] = map3 != null ? map3.Level : "0",
-                ["difficulty4"] = map4 != null ? map4.Level : "0",
-                ["difficulty5"] = map5 != null ? map5.Level : "0",
+                ["levelDesigner"] = LevelDesigners[0],
+                ["levelDesigner1"] = LevelDesigners[1],
+                ["levelDesigner2"] = LevelDesigners[2],
+                ["levelDesigner3"] = LevelDesigners[3],
+                ["levelDesigner4"] = LevelDesigners[4],
+                ["levelDesigner5"] = LevelDesigners[5],
+                ["difficulty1"] = Difficulties[1],
+                ["difficulty2"] = Difficulties[2],
+                ["difficulty3"] = Difficulties[3],
+                ["difficulty4"] = Difficulties[4],
+                ["difficulty5"] = Difficulties[5],
                 ["hideBmsMode"] = HiddenUnlockMethod.ToString(),
                 ["hideBmsDifficulty"] = ((sbyte)HiddenUnlockType).ToString(),
                 ["hideBmsMessage"] = HiddenUnlockMessage
@@ -107,41 +102,26 @@ namespace ChartManager.Data
             }
             else Tags = new string[] { };
 
-            if (root.TryGetProperty("levelDesigner", out var designer))
+            if (root.TryGetProperty("levelDesigner", out var designer0))
             {
-                var str = designer.GetString();
-                LevelDesigner = string.IsNullOrWhiteSpace(str) ? Placeholder : str;
+                var str = designer0.GetString();
+                LevelDesigners[0] = string.IsNullOrWhiteSpace(str) ? Placeholder : str;
             }
-            else LevelDesigner = Placeholder;
+            else LevelDesigners[0] = Placeholder;
 
-            if (root.TryGetProperty("levelDesigner1", out var designer1))
+            for (byte i = 1; i <= 5; i++)
             {
-                var str = designer1.GetString();
-                LevelDesigner1 = string.IsNullOrWhiteSpace(str) ? null : str;
-            }
+                if (root.TryGetProperty("levelDesigner" + i, out var designer))
+                {
+                    var str = designer.GetString();
+                    LevelDesigners[i] = string.IsNullOrWhiteSpace(str) ? null : str;
+                }
 
-            if (root.TryGetProperty("levelDesigner2", out var designer2))
-            {
-                var str = designer2.GetString();
-                LevelDesigner2 = string.IsNullOrWhiteSpace(str) ? null : str;
-            }
-
-            if (root.TryGetProperty("levelDesigner3", out var designer3))
-            {
-                var str = designer3.GetString();
-                LevelDesigner3 = string.IsNullOrWhiteSpace(str) ? null : str;
-            }
-
-            if (root.TryGetProperty("levelDesigner4", out var designer4))
-            {
-                var str = designer4.GetString();
-                LevelDesigner4 = string.IsNullOrWhiteSpace(str) ? null : str;
-            }
-
-            if (root.TryGetProperty("levelDesigner5", out var designer5))
-            {
-                var str = designer5.GetString();
-                LevelDesigner5 = string.IsNullOrWhiteSpace(str) ? null : str;
+                if (root.TryGetProperty("difficulty" + i, out var diff))
+                {
+                    var str = diff.GetString();
+                    Difficulties[i] = string.IsNullOrWhiteSpace(str) ? null : str;
+                }
             }
 
             if (root.TryGetProperty("scene", out var scene))

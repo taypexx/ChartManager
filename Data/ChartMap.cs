@@ -1,24 +1,23 @@
 ﻿using ChartManager.Managers;
 using ChartManager.Static;
-using Il2CppRewired.UI.ControlMapper;
-using System.Text;
 
 namespace ChartManager.Data
 {
     internal class ChartMap
     {
         internal Chart Chart;
+        internal string BmsData;
         internal string BmsName => $"map{Difficulty}.bms";
         internal byte Difficulty;
-        internal string Level;
-        internal string LevelDesigner;
+        internal string Level => Chart.Info.Difficulties[Difficulty];
+        internal string LevelDesigner => Chart.Info.LevelDesigners[Difficulty];
         internal NoteSpeed InitialSpeed;
         internal Scene InitialScene;
         internal float InitialBPM;
 
-        private void RefreshExtraFromData(string data)
+        private void RefreshExtra()
         {
-            var lines = data.Split('\n');
+            var lines = BmsData.Split('\n');
 
             try
             {
@@ -52,8 +51,8 @@ namespace ChartManager.Data
         {
             try
             {
-                var data = SystemManager.GetFromTemp(Chart, BmsName);
-                RefreshExtraFromData(data);
+                BmsData = SystemManager.GetFromTemp(Chart, BmsName);
+                RefreshExtra();
             }
             catch (Exception ex)
             {
@@ -65,35 +64,8 @@ namespace ChartManager.Data
         {
             try
             {
-                var info = Chart.Info;
-                Level = info.Difficulties.TryGetValue(Difficulty, out var level) ? level : "?";
-
-                string designer;
-                switch (Difficulty)
-                {
-                    case 1:
-                        designer = info.LevelDesigner1;
-                        break;
-                    case 2:
-                        designer = info.LevelDesigner2;
-                        break;
-                    case 3:
-                        designer = info.LevelDesigner3;
-                        break;
-                    case 4:
-                        designer = info.LevelDesigner4;
-                        break;
-                    case 5:
-                        designer = info.LevelDesigner5;
-                        break;
-                    default:
-                        designer = Chart.Info.LevelDesigner;
-                        break;
-                }
-                LevelDesigner = designer;
-
-                using var bmsFile = album.OpenFileStreamIfPossible(BmsName);
-                RefreshExtraFromStream(bmsFile);
+                BmsData = SystemManager.GetFromAlbum(Chart.Album, BmsName);
+                RefreshExtra();
             }
             catch (Exception ex)
             {
@@ -105,7 +77,7 @@ namespace ChartManager.Data
         {
             try
             {
-                File.WriteAllText(TempPath, BmsData);
+                SystemManager.WriteToTemp(Chart, BmsName, BmsData);
             }
             catch (Exception ex)
             {
