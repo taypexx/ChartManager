@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using Il2CppAssets.Scripts.UI.Panels.PnlMusicTag;
-using ChartManager.UI.Extensions;
+﻿using ChartManager.UI.Extensions;
 using ChartManager.UI.Windows;
 using Il2CppAssets.Scripts.UI.Panels;
+using Il2CppAssets.Scripts.UI.Panels.PnlMusicTag;
+using UnityEngine;
 
 namespace ChartManager.Managers
 {

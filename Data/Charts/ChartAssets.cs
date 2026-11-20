@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ChartManager.Data
+namespace ChartManager.Data.Charts
 {
     internal class ChartAssets
     {

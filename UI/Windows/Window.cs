@@ -1,11 +1,11 @@
-﻿using Il2CppAssets.Scripts.UI.Tips;
+﻿using ChartManager.Data;
+using ChartManager.Managers;
+using ChartManager.UI.Extensions;
+using Il2CppAssets.Scripts.UI.Tips;
 using LocalizeLib;
 using PopupLib.UI.Components;
 using PopupLib.UI.Windows;
 using PopupLib.UI.Windows.Abstract;
-using ChartManager.Data;
-using ChartManager.Managers;
-using ChartManager.UI.Extensions;
 
 namespace ChartManager.UI.Windows
 {

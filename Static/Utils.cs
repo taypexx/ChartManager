@@ -1,4 +1,4 @@
-﻿using ChartManager.Data;
+﻿using ChartManager.Data.Charts;
 using Il2CppSirenix.Serialization.Utilities;
 using System.Diagnostics;
 using System.IO.Compression;
@@ -17,6 +17,7 @@ namespace ChartManager.Static
         {
             WriteIndented = true,
             PropertyNameCaseInsensitive = true,
+            AllowTrailingCommas = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 

@@ -1,4 +1,4 @@
-﻿using ChartManager.Data;
+﻿using ChartManager.Data.Charts;
 using ChartManager.Managers;
 
 namespace ChartManager.UI.Windows

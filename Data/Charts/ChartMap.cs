@@ -1,7 +1,6 @@
-﻿using ChartManager.Managers;
-using ChartManager.Static;
+﻿using ChartManager.Static;
 
-namespace ChartManager.Data
+namespace ChartManager.Data.Charts
 {
     internal class ChartMap
     {
@@ -51,7 +50,7 @@ namespace ChartManager.Data
         {
             try
             {
-                BmsData = SystemManager.GetFromTemp(Chart, BmsName);
+                BmsData = Chart.GetFromTemp(BmsName);
                 RefreshExtra();
             }
             catch (Exception ex)
@@ -64,7 +63,7 @@ namespace ChartManager.Data
         {
             try
             {
-                BmsData = SystemManager.GetFromAlbum(Chart.Album, BmsName);
+                BmsData = Chart.GetFromAlbum(BmsName);
                 RefreshExtra();
             }
             catch (Exception ex)
@@ -77,7 +76,7 @@ namespace ChartManager.Data
         {
             try
             {
-                SystemManager.WriteToTemp(Chart, BmsName, BmsData);
+                Chart.WriteToTemp(BmsName, BmsData);
             }
             catch (Exception ex)
             {
@@ -89,7 +88,7 @@ namespace ChartManager.Data
         {
             try
             {
-                SystemManager.WriteToAlbum(Chart.Album, BmsName, BmsData);
+                Chart.WriteToAlbum(BmsName, BmsData);
             }
             catch (Exception ex)
             {
@@ -97,10 +96,10 @@ namespace ChartManager.Data
             }
         }
 
-        internal ChartMap(Chart chart, int difficulty)
+        internal ChartMap(Chart chart, byte difficulty)
         {
             Chart = chart;
-            Difficulty = (byte)difficulty;
+            Difficulty = difficulty;
 
             RefreshFromAlbum();
         }

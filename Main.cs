@@ -1,8 +1,8 @@
-﻿using System.Reflection;
-using ChartManager.Managers;
+﻿using ChartManager.Managers;
 using ChartManager.Static;
 using MelonLoader;
 using Multiplayer.Static;
+using System.Reflection;
 
 namespace ChartManager
 {
@@ -51,7 +51,7 @@ namespace ChartManager
                 }
             }
 
-            SystemManager.CreateMainFolder();
+            SystemManager.Init();
         }
 
         public override void OnUpdate()

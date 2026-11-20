@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using ChartManager.Data;
+using UnityEngine;
 using UnityEngine.UI;
-using ChartManager.Data;
 
 namespace ChartManager.Managers
 {

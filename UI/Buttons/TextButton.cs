@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using ChartManager.Static;
+using UnityEngine;
 using UnityEngine.UI;
-using ChartManager.Static;
 
 namespace ChartManager.UI.Buttons
 {

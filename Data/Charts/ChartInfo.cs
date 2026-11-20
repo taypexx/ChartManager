@@ -1,13 +1,9 @@
-﻿using ChartManager.Managers;
-using ChartManager.Static;
+﻿using ChartManager.Static;
 using CustomAlbums.Data;
-using Il2Cpprail;
-using Il2CppSirenix.Serialization.Utilities;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using static MelonLoader.Modules.MelonModule;
 
-namespace ChartManager.Data
+namespace ChartManager.Data.Charts
 {
     internal class ChartInfo
     {
@@ -21,7 +17,7 @@ namespace ChartManager.Data
         internal string Author;
         internal string BPM;
         internal string[] Tags;
-        internal Dictionary<byte, string> LevelDesigners;
+        internal Dictionary<byte,string> LevelDesigners;
         internal Dictionary<byte,string> Difficulties;
 
         internal Scene BaseScene;
@@ -132,8 +128,10 @@ namespace ChartManager.Data
 
             if (root.TryGetProperty("sceneEgg", out var sceneEgg_))
             {
-                Enum.TryParse(typeof(SceneEgg.SceneEggs), sceneEgg_.GetString(), out var sceneEgg);
-                SceneEgg = (SceneEgg.SceneEggs)sceneEgg;
+                if (Enum.TryParse(typeof(SceneEgg.SceneEggs), sceneEgg_.GetString(), out var sceneEgg))
+                {
+                    SceneEgg = (SceneEgg.SceneEggs)sceneEgg;
+                }
             }
             else SceneEgg = CustomAlbums.Data.SceneEgg.SceneEggs.None;
 
@@ -145,7 +143,11 @@ namespace ChartManager.Data
 
             if (root.TryGetProperty("hideBmsDifficulty", out var hideBmsDifficulty))
             {
-                HiddenUnlockType = Utils.HiddenUnlockTypeFromString(hideBmsDifficulty.GetString());
+                HiddenUnlockType = Utils.HiddenUnlockTypeFromString(
+                    hideBmsDifficulty.ValueKind == JsonValueKind.String
+                    ? hideBmsDifficulty.GetString()
+                    : hideBmsDifficulty.GetSByte().ToString()
+                );
             }
             else HiddenUnlockType = HiddenUnlockType.Default;
 
@@ -161,7 +163,7 @@ namespace ChartManager.Data
         {
             try
             {
-                var json = SystemManager.GetFromTemp(Chart, InfoFile);
+                var json = Chart.GetFromTemp(InfoFile);
                 RefreshFromJson(json);
             }
             catch (Exception ex)
@@ -174,7 +176,7 @@ namespace ChartManager.Data
         {
             try
             {
-                var json = SystemManager.GetFromAlbum(Chart.Album, InfoFile);
+                var json = Chart.GetFromAlbum(InfoFile);
                 RefreshFromJson(json);
             }
             catch (Exception ex)
@@ -188,7 +190,7 @@ namespace ChartManager.Data
             try
             {
                 var json = GetJson();
-                SystemManager.WriteToTemp(Chart, InfoFile, json);
+                Chart.WriteToTemp(InfoFile, json);
             }
             catch (Exception ex)
             {
@@ -201,7 +203,7 @@ namespace ChartManager.Data
             try
             {
                 var json = GetJson();
-                SystemManager.WriteToAlbum(Chart.Album, InfoFile, json);
+                Chart.WriteToAlbum(InfoFile, json);
             }
             catch (Exception ex)
             {
@@ -212,6 +214,8 @@ namespace ChartManager.Data
         internal ChartInfo(Chart chart)
         {
             Chart = chart;
+            LevelDesigners = new();
+            Difficulties = new();
 
             RefreshFromAlbum();
         }

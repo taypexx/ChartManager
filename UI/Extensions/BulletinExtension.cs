@@ -3,7 +3,6 @@ using ChartManager.Static;
 using ChartManager.UI.Windows;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.TestTools;
 using UnityEngine.UI;
 
 namespace ChartManager.UI.Extensions

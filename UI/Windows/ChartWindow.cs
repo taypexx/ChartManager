@@ -1,14 +1,9 @@
-﻿using ChartManager.Data;
+﻿using ChartManager.Data.Charts;
 using ChartManager.Managers;
 using ChartManager.UI.Extensions;
-using LocalizeLib;
-using Multiplayer.Static;
-using PopupLib.UI;
 using PopupLib.UI.Components;
 using PopupLib.UI.Windows.Abstract;
 using PopupLib.UI.Windows.Interfaces;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace ChartManager.UI.Windows
 {

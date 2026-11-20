@@ -1,9 +1,8 @@
-﻿using ChartManager.Managers;
-using ChartManager.Static;
+﻿using ChartManager.Static;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace ChartManager.Data
+namespace ChartManager.Data.Charts
 {
     internal class ChartCinema
     {
@@ -67,7 +66,7 @@ namespace ChartManager.Data
         {
             try
             {
-                var json = SystemManager.GetFromTemp(Chart, CinemaFile);
+                var json = Chart.GetFromTemp(CinemaFile);
                 RefreshFromJson(json);
             }
             catch (Exception ex)
@@ -80,7 +79,7 @@ namespace ChartManager.Data
         {
             try
             {
-                var json = SystemManager.GetFromAlbum(Chart.Album, CinemaFile);
+                var json = Chart.GetFromAlbum(CinemaFile);
                 RefreshFromJson(json);
             }
             catch (Exception ex)
@@ -94,7 +93,7 @@ namespace ChartManager.Data
             try
             {
                 var json = GetJson();
-                SystemManager.WriteToTemp(Chart, CinemaFile, json);
+                Chart.WriteToTemp(CinemaFile, json);
             }
             catch (Exception ex)
             {
@@ -107,7 +106,7 @@ namespace ChartManager.Data
             try
             {
                 var json = GetJson();
-                SystemManager.WriteToAlbum(Chart.Album, CinemaFile, json);
+                Chart.WriteToAlbum(CinemaFile, json);
             }
             catch (Exception ex)
             {

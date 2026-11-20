@@ -1,4 +1,4 @@
-﻿namespace ChartManager.Data
+﻿namespace ChartManager.Data.Charts
 {
     internal enum Scene : byte
     {
