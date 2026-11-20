@@ -108,8 +108,8 @@ namespace ChartManager.UI.Extensions
 
             BackButton = CreateTopButton(AssetManager.GetImageAsset("Icons.Back.png").Sprite, new(40f, 40f), new Action(() =>
             {
-                if (CurrentWindow == null) return;
-                CurrentWindow.Close();
+                if (PreviousWindow == null) return;
+                PreviousWindow.Show();
             }));
 
             ExitButton = CreateTopButton(AssetManager.GetImageAsset("Icons.Cross.png").Sprite, new(1090f, 40f), new Action(() =>

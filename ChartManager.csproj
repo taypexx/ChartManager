@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <None Remove="Assets\Banners\ChartWindow.png" />
-    <None Remove="Assets\Banners\MapsWindow.png" />
     <None Remove="Assets\Icons\Back.png" />
     <None Remove="Assets\Icons\Cross.png" />
     <None Remove="Assets\Icons\List.png" />
@@ -70,7 +69,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\Banners\ChartWindow.png" />
-    <EmbeddedResource Include="Assets\Banners\MapsWindow.png" />
     <EmbeddedResource Include="Assets\Icons\Back.png" />
     <EmbeddedResource Include="Assets\Icons\Cross.png" />
     <EmbeddedResource Include="Assets\Icons\List.png" />

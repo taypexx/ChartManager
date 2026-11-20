@@ -37,6 +37,34 @@ namespace ChartManager.Data.Charts
             return TempFolder;
         }
 
+        internal void Save()
+        {
+            // NOTE: info must be pulled from the temp folder before saving so this save may not save anything at all
+
+            // TODO: save assets
+
+            Info.RefreshFromTemp();
+            Info.SaveToAlbum();
+
+            foreach (var (_, map) in Maps)
+            {
+                map.RefreshFromTemp();
+                map.SaveToAlbum();
+            }
+
+            if (HasCinema)
+            {
+                Cinema.RefreshFromTemp();
+                Cinema.SaveToAlbum();
+            }
+        }
+
+        internal void Delete()
+        {
+            MainManager.RemoveChart(this);
+            File.Delete(Album.Path);
+        }
+
         private void CopyAlbumFiles()
         {
             try

@@ -83,12 +83,15 @@ namespace ChartManager.Static
             return num_;
         }
 
-        /// <summary>
-        /// Opens a <paramref name="url"/> in the default browser.
-        /// </summary>
-        public static void OpenBrowserLink(string url)
+        public static void StartProcess(string fileName)
         {
-            try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); }
+            try { 
+                Process.Start(new ProcessStartInfo() 
+                { 
+                    FileName = fileName,
+                    UseShellExecute = true 
+                }); 
+            }
             catch { }
         }
     }

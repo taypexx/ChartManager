@@ -16,15 +16,34 @@ namespace ChartManager.Data.Charts
         internal string? NameRomanized;
         internal string Author;
         internal string BPM;
+        internal Scene BaseScene;
         internal string[] Tags;
         internal Dictionary<byte,string> LevelDesigners;
         internal Dictionary<byte,string> Difficulties;
-
-        internal Scene BaseScene;
-        internal SceneEgg.SceneEggs SceneEgg;
         internal HiddenUnlockMethod HiddenUnlockMethod;
         internal HiddenUnlockType HiddenUnlockType;
         internal string HiddenUnlockMessage;
+        internal SceneEgg.SceneEggs SceneEgg;
+
+        public override string ToString()
+        {
+            var str = Name;
+            if (NameRomanized != null)
+            {
+                str += $" ({NameRomanized})";
+            }
+            str += $" - {Author}\n"
+            + $"[ BPM ]: {BPM}\n"
+            + $"[ Scene ]: {BaseScene.ToString()}\n"
+            + $"[ Tags ]: {(Tags.Length == 0 ? "-" : string.Join(", ", Tags))}\n"
+            + $"[ Level Designers ]: {string.Join(',', LevelDesigners)}\n"
+            + $"[ Difficulties ]: {string.Join(',', Difficulties)}\n"
+            + $"[ Hidden Unlock Method ]: {HiddenUnlockMethod.ToString()}\n"
+            + $"[ Hidden Unlock Type ]: {HiddenUnlockType.ToString()}\n"
+            + $"[ Hidden Unlock Message ]: {HiddenUnlockMessage.ToString()}\n"
+            + $"[ Scene Egg ]: {SceneEgg.ToString()}";
+            return str;
+        }
 
         internal string GetJson()
         {
@@ -49,7 +68,8 @@ namespace ChartManager.Data.Charts
                 ["difficulty5"] = Difficulties[5],
                 ["hideBmsMode"] = HiddenUnlockMethod.ToString(),
                 ["hideBmsDifficulty"] = ((sbyte)HiddenUnlockType).ToString(),
-                ["hideBmsMessage"] = HiddenUnlockMessage
+                ["hideBmsMessage"] = HiddenUnlockMessage,
+                ["sceneEgg"] = SceneEgg == CustomAlbums.Data.SceneEgg.SceneEggs.None ? null : SceneEgg.ToString()
             };
             return obj.ToJsonString(Utils.JsonOptions);
         }
@@ -92,6 +112,12 @@ namespace ChartManager.Data.Charts
             }
             else BPM = Placeholder;
 
+            if (root.TryGetProperty("scene", out var scene))
+            {
+                BaseScene = Utils.SceneFromString(scene.GetString());
+            }
+            else BaseScene = Scene.Unknown;
+
             if (root.TryGetProperty("searchTags", out var tags))
             {
                 Tags = JsonSerializer.Deserialize<string[]>(tags, Utils.JsonOptions) ?? new string[] {};
@@ -120,21 +146,6 @@ namespace ChartManager.Data.Charts
                 }
             }
 
-            if (root.TryGetProperty("scene", out var scene))
-            {
-                BaseScene = Utils.SceneFromString(scene.GetString());
-            }
-            else BaseScene = Scene.Unknown;
-
-            if (root.TryGetProperty("sceneEgg", out var sceneEgg_))
-            {
-                if (Enum.TryParse(typeof(SceneEgg.SceneEggs), sceneEgg_.GetString(), out var sceneEgg))
-                {
-                    SceneEgg = (SceneEgg.SceneEggs)sceneEgg;
-                }
-            }
-            else SceneEgg = CustomAlbums.Data.SceneEgg.SceneEggs.None;
-
             if (root.TryGetProperty("hideBmsMode", out var hideBmsMode))
             {
                 HiddenUnlockMethod = Utils.HiddenUnlockMethodFromString(hideBmsMode.GetString());
@@ -157,6 +168,15 @@ namespace ChartManager.Data.Charts
                 HiddenUnlockMessage = string.IsNullOrWhiteSpace(str) ? HiddenPlaceholder : str;
             }
             else HiddenUnlockMessage = HiddenPlaceholder;
+
+            if (root.TryGetProperty("sceneEgg", out var sceneEgg_))
+            {
+                if (Enum.TryParse(typeof(SceneEgg.SceneEggs), sceneEgg_.GetString(), out var sceneEgg))
+                {
+                    SceneEgg = (SceneEgg.SceneEggs)sceneEgg;
+                }
+            }
+            else SceneEgg = CustomAlbums.Data.SceneEgg.SceneEggs.None;
         }
 
         internal void RefreshFromTemp()

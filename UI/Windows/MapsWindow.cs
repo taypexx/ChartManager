@@ -1,11 +1,14 @@
 ﻿using ChartManager.Data.Charts;
 using ChartManager.Managers;
+using ChartManager.Static;
+using PopupLib.UI.Components;
+using PopupLib.UI.Windows.Interfaces;
 
 namespace ChartManager.UI.Windows
 {
     internal class MapsWindow : Window
     {
-        private static Dictionary<int, string> DifficultyNames = new()
+        private static readonly Dictionary<int, string> DifficultyNames = new()
         {
             [1] = "Easy",
             [2] = "Hard",
@@ -13,8 +16,8 @@ namespace ChartManager.UI.Windows
             [4] = "Hidden",
             [5] = "Touhou"
         };
-
         internal Chart CurrentChart => UIManager.ChartWindow.CurrentChart;
+        private Dictionary<ForumObject, ChartMap> ButtonsMaps;
 
         internal override void Show()
         {
@@ -28,15 +31,29 @@ namespace ChartManager.UI.Windows
         {
             if (CurrentChart == null) return;
 
-            foreach (var diff in CurrentChart.Maps.Keys)
+            foreach (var (diff, map) in CurrentChart.Maps)
             {
-                AddButton(DifficultyNames[diff]);
+                var button = AddButton(DifficultyNames[diff]);
+                ButtonsMaps.Add(button, map);
             }
         }
 
-        internal MapsWindow() : base("Maps", "MapsWindow.png", true)
+        internal override void OnClick(IListWindow _, int objectIndex)
         {
+            var button = Base.ForumObjects[objectIndex];
+            
+            if (ButtonsMaps.TryGetValue(button, out var map))
+            {
+                Utils.StartProcess(Path.Combine(map.Chart.GetTempFolder().FullName, map.BmsName));
+                UIManager.ChartWindow.EditSaved = false;
+            }
 
+            base.OnClick(_, objectIndex);
+        }
+
+        internal MapsWindow() : base("Maps", null, true)
+        {
+            ButtonsMaps = new();
         }
     }
 }

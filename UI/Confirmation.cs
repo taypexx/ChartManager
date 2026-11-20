@@ -14,10 +14,14 @@ namespace ChartManager.UI
 
         private void OnResult(PopupLib.UI.Windows.Abstract.BaseWindow _)
         {
-            if (Base.Result == true)
+            if (OnConfirm != null && Base.Result == true)
+            {
                 OnConfirm.Invoke();
+            }
             else if (OnCancel != null)
+            {
                 OnCancel.Invoke();
+            }
         }
 
         internal Confirmation(string title, string text, Action onConfirm, Action? onCancel = null)
@@ -25,6 +29,9 @@ namespace ChartManager.UI
             Base = new(new(text), new(title));
             Base.AutoReset = true;
             Base.OnCompletion += OnResult;
+
+            OnConfirm = onConfirm;
+            OnCancel = onCancel;
         }
     }
 }

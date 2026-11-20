@@ -8,20 +8,11 @@ namespace ChartManager.Managers
     {
         internal static Dictionary<string, Chart> Charts = new();
 
-        internal static void SaveChart(Chart chart)
+        internal static void RemoveChart(Chart chart)
         {
-            // NOTE: info must be pulled from the temp folder before saving so this save may not save anything at all
-
-            // TODO: save assets
-
-            chart.Info.SaveToAlbum();
-
-            foreach (var (_,map) in chart.Maps)
-            {
-                map.SaveToAlbum();
-            }
-
-            if (chart.HasCinema) chart.Cinema.SaveToAlbum();
+            var key = chart.Album.Uid;
+            if (!Charts.ContainsKey(key)) return;
+            Charts.Remove(key);
         }
 
         internal static void InitCharts()

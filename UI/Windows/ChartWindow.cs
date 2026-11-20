@@ -9,23 +9,34 @@ namespace ChartManager.UI.Windows
 {
     internal class ChartWindow : Window
     {
-        private ForumObject InfoButton;
         private ForumObject AssetsButton;
+        private ForumObject InfoButton;
         private ForumObject MapsButton;
         private ForumObject CinemaButton;
         private ForumObject SaveButton;
+        private ForumObject DeleteButton;
 
         private Confirmation SaveConfirmation;
         private Confirmation UnsavedConfirmation;
+        private Confirmation DeleteConfirmation;
 
         internal Chart CurrentChart { get; private set; }
-        internal bool EditSaved { get; private set; }
+        internal bool EditSaved { get; set; }
 
-        private void SaveEdit()
+        private void OnSaveConfirm()
         {
-            MainManager.SaveChart(CurrentChart);
+            CurrentChart.Save();
             EditSaved = true;
             Show();
+        }
+
+        private void OnDeleteConfirm()
+        {
+            CurrentChart.Delete();
+            CurrentChart = null;
+
+            // TODO: move to the closest chart instead of going back to the first
+            base.Close();
         }
 
         internal void Show(Chart? chart = null)
@@ -37,6 +48,7 @@ namespace ChartManager.UI.Windows
             }
 
             Title = new(CurrentChart.Info.Name);
+            UpdateContent(CurrentChart.Info.ToString());
 
             base.Show();
         }
@@ -68,23 +80,30 @@ namespace ChartManager.UI.Windows
             {
                 SaveConfirmation.Show();
             }
+            else if (button == DeleteButton)
+            {
+                DeleteConfirmation.Show();
+            }
 
             base.OnClick(_, objectIndex);
         }
 
         internal override void CreateButtons()
         {
-            InfoButton = AddButton("Info");
             AssetsButton = AddButton("Assets");
+            InfoButton = AddButton("Info");
             MapsButton = AddButton("Maps", UIManager.MapsWindow);
             CinemaButton = AddButton("Cinema");
-            SaveButton = AddButton("< Save >", this);
+            SaveButton = AddButton("< Save >");
+            DeleteButton = AddButton("< Delete>");
         }
 
         internal ChartWindow() : base("Chart Editor", "ChartWindow.png", false)
         {
-            SaveConfirmation = new("Saving", "Save the chart? This action will overwrite existing data.", SaveEdit, Show);
+            SaveConfirmation = new("Saving", "Save the chart? This action will overwrite existing data.", OnSaveConfirm, Show);
             UnsavedConfirmation = new("Unsaved progress", "You have unsaved changes. Would you like to exit?", base.Close, Show);
+            DeleteConfirmation = new("Deleting", "This chart will be deleted forever. Would you like to proceed?", OnDeleteConfirm, Show);
+
             EditSaved = true;
         }
     }
