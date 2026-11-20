@@ -1,8 +1,7 @@
-﻿using ChartManager.Static;
+﻿using ChartManager.Data;
+using ChartManager.Static;
 using CustomAlbums.Albums;
 using CustomAlbums.Data;
-using Il2Cpprail;
-using MelonLoader.ICSharpCode.SharpZipLib.GZip;
 using System.IO.Compression;
 using System.Windows.Forms;
 
@@ -33,15 +32,14 @@ namespace ChartManager.Managers
 
         internal static void CopyHitsounds(DirectoryInfo folder)
         {
-
             foreach (var resourceName in Main.CurrentAssembly.GetManifestResourceNames().Where(n => n.StartsWith(HitsoundsPath)))
             {
                 using var stream = Main.CurrentAssembly.GetManifestResourceStream(resourceName);
                 if (stream == null) continue;
 
-                byte[] wav = new byte[] { };
-                stream.Read(wav);
-                File.WriteAllBytes(Path.Combine(folder.FullName, resourceName.Substring(HitsoundsPath.Length)), wav);
+                var path = Path.Combine(folder.FullName, resourceName.Substring(HitsoundsPath.Length));
+                using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write);
+                stream.CopyTo(fileStream);
             }
         }
 
@@ -58,15 +56,18 @@ namespace ChartManager.Managers
                         ZipFile.ExtractToDirectory(album.Path, folder.FullName, overwriteFiles: true);
                         break;
                     case PackAlbum:
-                        var mdp = ZipFile.OpenRead(album.Path);
-                        var openedMdm = Utils.GetNestedZip(mdp, ((PackAlbum)album).PackAlbumName + ".mdm", ZipArchiveMode.Read);
-                        openedMdm.ExtractToDirectory(folder.FullName, overwriteFiles: true);
+                        using (var mdp = ZipFile.OpenRead(album.Path))
+                        {
+                            using (var openedMdm = Utils.GetNestedZip(mdp, ((PackAlbum)album).PackAlbumName + ".mdm", ZipArchiveMode.Read))
+                            {
+                                openedMdm.ExtractToDirectory(folder.FullName, overwriteFiles: true);
+                            }
+                        }
                         break;
                     case FolderAlbum:
                         foreach (string file in Directory.GetFiles(album.Path))
                         {
                             string destination = Path.Combine(folder.FullName, Path.GetFileName(file));
-
                             File.Copy(file, destination, overwrite: true);
                         }
                         break;
@@ -79,6 +80,53 @@ namespace ChartManager.Managers
             catch (Exception ex)
             {
                 Log.Error($"Failed to copy album files of the {album.AlbumName}: {ex}");
+            }
+            return null;
+        }
+
+        private static string GetFromZip(ZipArchive zip, string fileName)
+        {
+            var entry = zip.GetEntry(fileName);
+            using (var reader = new StreamReader(entry.Open()))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+        internal static string? GetFromAlbum(Album album, string fileName)
+        {
+            try
+            {
+                if (!album.HasFile(fileName))
+                {
+                    throw new FileNotFoundException("File doesn't exist.");
+                }
+
+                switch (album)
+                {
+                    case ArchiveAlbum:
+                        using (var mdm = ZipFile.Open(album.Path, ZipArchiveMode.Read))
+                        {
+                            return GetFromZip(mdm, fileName);
+                        }
+                    case PackAlbum:
+                        using (var mdp = ZipFile.Open(album.Path, ZipArchiveMode.Read))
+                        {
+                            using (var mdm = Utils.GetNestedZip(mdp, ((PackAlbum)album).PackAlbumName + ".mdm", ZipArchiveMode.Read))
+                            {
+                                return GetFromZip(mdm, fileName);
+                            }
+                        }
+                    case FolderAlbum:
+                        var path = Path.Combine(album.Path, fileName);
+                        return File.ReadAllText(path);
+                    default:
+                        throw new Exception("Unknown album type.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Failed to write {fileName} to the {album.AlbumName}: {ex}");
             }
             return null;
         }
@@ -96,6 +144,11 @@ namespace ChartManager.Managers
         {
             try
             {
+                if (!album.HasFile(fileName))
+                {
+                    throw new FileNotFoundException("File doesn't exist.");
+                }
+
                 switch (album)
                 {
                     case ArchiveAlbum:
@@ -124,6 +177,43 @@ namespace ChartManager.Managers
             catch (Exception ex)
             {
                 Log.Error($"Failed to write {fileName} to the {album.AlbumName}: {ex}");
+            }
+        }
+
+        internal static string? GetFromTemp(Chart chart, string fileName)
+        {
+            try
+            {
+                var path = Path.Combine(chart.GetTempFolder().FullName, fileName);
+                if (!File.Exists(path))
+                {
+                    throw new FileNotFoundException("File doesn't exist.");
+                }
+
+                return File.ReadAllText(path);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Failed to get {fileName} from the {chart.Album.AlbumName} temp folder: {ex}");
+            }
+            return null;
+        }
+
+        internal static void WriteToTemp(Chart chart, string fileName, string data)
+        {
+            try
+            {
+                var path = Path.Combine(chart.GetTempFolder().FullName, fileName);
+                if (!File.Exists(path))
+                {
+                    throw new FileNotFoundException("File doesn't exist.");
+                }
+
+                File.WriteAllText(path, data);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Failed to write {fileName} to the {chart.Album.AlbumName} temp folder: {ex}");
             }
         }
 

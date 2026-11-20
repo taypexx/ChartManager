@@ -8,9 +8,7 @@ namespace ChartManager.Data
     internal class ChartMap
     {
         internal Chart Chart;
-        internal string BmsData;
         internal string BmsName => $"map{Difficulty}.bms";
-        internal string TempPath => Path.Combine(Chart.GetTempFolder().FullName, $"map{Difficulty}.bms");
         internal byte Difficulty;
         internal string Level;
         internal string LevelDesigner;
@@ -18,56 +16,44 @@ namespace ChartManager.Data
         internal Scene InitialScene;
         internal float InitialBPM;
 
-        private void RefreshExtraFromStream(Stream bmsFile)
+        private void RefreshExtraFromData(string data)
         {
-            using (var reader = new StreamReader(bmsFile, Encoding.UTF8))
+            var lines = data.Split('\n');
+
+            try
             {
-                BmsData = reader.ReadToEnd();
-                var lines = BmsData.Split('\n');
-
-                try
-                {
-                    var speedLine = lines.First((l) => l.StartsWith("#PLAYER"));
-                    InitialSpeed = Enum.TryParse(speedLine.Split(' ')[1], out NoteSpeed speed)
-                        ? speed
-                        : NoteSpeed.Speed2;
-                }
-                catch { InitialSpeed = NoteSpeed.Speed2; }
-
-                try
-                {
-                    var sceneLine = lines.First((l) => l.StartsWith("#GENRE"));
-                    InitialScene = Enum.TryParse(sceneLine.Split(' ')[1], out Scene scene)
-                        ? scene
-                        : Scene.SpaceStation;
-                }
-                catch { InitialScene = Scene.SpaceStation; }
-
-                try
-                {
-                    var bpmLine = lines.First((l) => l.StartsWith("#BPM"));
-                    InitialBPM = float.TryParse(bpmLine.Split(' ')[1], out var bpm)
-                        ? bpm
-                        : 120f;
-                }
-                catch { InitialBPM = 120f; }
+                var speedLine = lines.First((l) => l.StartsWith("#PLAYER"));
+                InitialSpeed = Enum.TryParse(speedLine.Split(' ')[1], out NoteSpeed speed)
+                    ? speed
+                    : NoteSpeed.Speed2;
             }
+            catch { InitialSpeed = NoteSpeed.Speed2; }
+
+            try
+            {
+                var sceneLine = lines.First((l) => l.StartsWith("#GENRE"));
+                InitialScene = Enum.TryParse(sceneLine.Split(' ')[1], out Scene scene)
+                    ? scene
+                    : Scene.SpaceStation;
+            }
+            catch { InitialScene = Scene.SpaceStation; }
+
+            try
+            {
+                var bpmLine = lines.First((l) => l.StartsWith("#BPM"));
+                InitialBPM = float.TryParse(bpmLine.Split(' ')[1], out var bpm)
+                    ? bpm
+                    : 120f;
+            }
+            catch { InitialBPM = 120f; }
         }
 
         internal void RefreshFromTemp()
         {
             try
             {
-                if (!File.Exists(TempPath))
-                {
-                    throw new FileNotFoundException("File doesn't exist.");
-                }
-
-                var bmsFile = File.OpenRead(TempPath);
-
-                // TODO: Main refresh
-
-                RefreshExtraFromStream(bmsFile);
+                var data = SystemManager.GetFromTemp(Chart, BmsName);
+                RefreshExtraFromData(data);
             }
             catch (Exception ex)
             {
@@ -79,13 +65,7 @@ namespace ChartManager.Data
         {
             try
             {
-                var album = Chart.Album;
-                if (!album.HasFile(BmsName))
-                {
-                    throw new FileNotFoundException("File doesn't exist.");
-                }
-
-                var info = album.Info;
+                var info = Chart.Info;
                 Level = info.Difficulties.TryGetValue(Difficulty, out var level) ? level : "?";
 
                 string designer;
@@ -112,7 +92,7 @@ namespace ChartManager.Data
                 }
                 LevelDesigner = designer;
 
-                var bmsFile = album.OpenFileStreamIfPossible(BmsName);
+                using var bmsFile = album.OpenFileStreamIfPossible(BmsName);
                 RefreshExtraFromStream(bmsFile);
             }
             catch (Exception ex)

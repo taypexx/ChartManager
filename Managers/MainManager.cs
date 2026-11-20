@@ -10,6 +10,8 @@ namespace ChartManager.Managers
 
         internal static void SaveChart(Chart chart)
         {
+            // NOTE: info must be pulled from the temp folder before saving so this save may not save anything at all
+
             // TODO: save assets
 
             chart.Info.SaveToAlbum();

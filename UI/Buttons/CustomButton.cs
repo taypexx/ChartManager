@@ -1,6 +1,4 @@
 ﻿using ChartManager.Managers;
-using Il2CppAssets.Scripts.PeroTools.Commons;
-using Il2CppAssets.Scripts.PeroTools.Managers;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Events;

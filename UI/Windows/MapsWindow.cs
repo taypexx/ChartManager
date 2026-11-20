@@ -1,4 +1,5 @@
 ﻿using ChartManager.Data;
+using ChartManager.Managers;
 
 namespace ChartManager.UI.Windows
 {
@@ -13,15 +14,10 @@ namespace ChartManager.UI.Windows
             [5] = "Touhou"
         };
 
-        internal Chart CurrentChart { get; private set; }
+        internal Chart CurrentChart => UIManager.ChartWindow.CurrentChart;
 
-        internal void Show(Chart? chart = null)
+        internal override void Show()
         {
-            if (chart != null)
-            {
-                CurrentChart = chart;
-            }
-
             RemoveButtons();
             CreateButtons();
 

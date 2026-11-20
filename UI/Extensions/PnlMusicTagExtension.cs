@@ -2,7 +2,6 @@
 using CustomAlbums.Managers;
 using HarmonyLib;
 using Il2Cpp;
-using Il2CppAssets.Scripts.PeroTools.Nice.Components;
 using Il2CppAssets.Scripts.UI.Panels.PnlMusicTag;
 using UnityEngine;
 

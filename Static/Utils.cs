@@ -1,6 +1,4 @@
 ﻿using ChartManager.Data;
-using CustomAlbums.Albums;
-using CustomAlbums.Data;
 using Il2CppSirenix.Serialization.Utilities;
 using System.Diagnostics;
 using System.IO.Compression;
@@ -25,7 +23,7 @@ namespace ChartManager.Static
         public static ZipArchive GetNestedZip(this ZipArchive mdp, string entryName, ZipArchiveMode mode)
         {
             var mdm = mdp.GetEntry(entryName) ?? throw new ArgumentException($"Entry {entryName} not found.");
-            var mdmStream = mdm.Open();
+            using var mdmStream = mdm.Open();
             var openedMdm = new ZipArchive(mdmStream, mode, false);
             return openedMdm;
         }

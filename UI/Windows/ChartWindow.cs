@@ -21,6 +21,7 @@ namespace ChartManager.UI.Windows
         private ForumObject SaveButton;
 
         private Confirmation SaveConfirmation;
+        private Confirmation UnsavedConfirmation;
 
         internal Chart CurrentChart { get; private set; }
         internal bool EditSaved { get; private set; }
@@ -29,6 +30,7 @@ namespace ChartManager.UI.Windows
         {
             MainManager.SaveChart(CurrentChart);
             EditSaved = true;
+            Show();
         }
 
         internal void Show(Chart? chart = null)
@@ -41,7 +43,6 @@ namespace ChartManager.UI.Windows
 
             Title = new(CurrentChart.Info.Name);
 
-            SoundManager.PlayTroveBGM();
             base.Show();
         }
 
@@ -49,7 +50,7 @@ namespace ChartManager.UI.Windows
         {
             if (EditSaved) 
                 base.Close();
-            else SaveConfirmation.Show();
+            else UnsavedConfirmation.Show();
         }
 
         internal override void OnShow(BaseWindow _)
@@ -60,7 +61,6 @@ namespace ChartManager.UI.Windows
 
         internal override void OnClose(BaseWindow _)
         {
-            SoundManager.RestoreMusic();
             BulletinExtension.ToggleCover(false);
             base.OnClose(_);
         }
@@ -71,7 +71,7 @@ namespace ChartManager.UI.Windows
             
             if (button == SaveButton)
             {
-                SaveEdit();
+                SaveConfirmation.Show();
             }
 
             base.OnClick(_, objectIndex);
@@ -88,7 +88,8 @@ namespace ChartManager.UI.Windows
 
         internal ChartWindow() : base("Chart Editor", "ChartWindow.png", false)
         {
-            SaveConfirmation = new("Unsaved progress", "You have unsaved changes. Would you like to exit?", base.Close, Show);
+            SaveConfirmation = new("Saving", "Save the chart? This action will overwrite existing data.", SaveEdit, Show);
+            UnsavedConfirmation = new("Unsaved progress", "You have unsaved changes. Would you like to exit?", base.Close, Show);
             EditSaved = true;
         }
     }

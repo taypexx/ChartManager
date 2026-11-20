@@ -7,28 +7,32 @@ namespace ChartManager.Data
 {
     internal class ChartCinema
     {
+        private const string CinemaFile = "cinema.json";
         private const string DefaultFileName = "video.mp4";
         private const float DefaultOpacity = 0.5f;
 
         internal Chart Chart;
-        internal string TempPath => Path.Combine(Chart.GetTempFolder().FullName, "cinema.json");
         internal string FileName;
         internal float Opacity;
         internal byte[] Difficulties;
 
-        internal JsonObject GetJson() => new()
+        internal string GetJson()
         {
-            ["file_name"] = FileName,
-            ["opacity"] = Opacity,
-            ["difficulties"] = Difficulties == null || Difficulties.Length == 0 ? null : new JsonArray(Difficulties.Select(d => JsonValue.Create(d)).ToArray()),
-        };
+            var obj = new JsonObject()
+            {
+                ["file_name"] = FileName,
+                ["opacity"] = Opacity,
+                ["difficulties"] = Difficulties == null || Difficulties.Length == 0 ? null : new JsonArray(Difficulties.Select(d => JsonValue.Create(d)).ToArray()),
+            };
+            return obj.ToJsonString(Utils.JsonOptions);
+        } 
 
-        private void RefreshFromStream(Stream stream)
+        private void RefreshFromJson(string rawJson)
         {
-            var json = JsonSerializer.Deserialize<JsonDocument>(stream);
+            var json = JsonSerializer.Deserialize<JsonDocument>(rawJson, Utils.JsonOptions);
             if (json == null)
             {
-                Log.Error("Failed to parse cinema.json!");
+                Log.Error($"Failed to parse {CinemaFile}.");
 
                 FileName = DefaultFileName;
                 Opacity = DefaultOpacity;
@@ -63,12 +67,8 @@ namespace ChartManager.Data
         {
             try
             {
-                if (!File.Exists(TempPath))
-                {
-                    throw new FileNotFoundException("File doesn't exist.");
-                }
-
-                // TODO: refresh here
+                var json = SystemManager.GetFromTemp(Chart, CinemaFile);
+                RefreshFromJson(json);
             }
             catch (Exception ex)
             {
@@ -80,14 +80,8 @@ namespace ChartManager.Data
         {
             try
             {
-                var album = Chart.Album;
-                if (!album.HasFile("cinema.json"))
-                {
-                    throw new FileNotFoundException("File doesn't exist.");
-                }
-
-                using var stream = album.OpenFileStreamIfPossible("cinema.json");
-                RefreshFromStream(stream);
+                var json = SystemManager.GetFromAlbum(Chart.Album, CinemaFile);
+                RefreshFromJson(json);
             }
             catch (Exception ex)
             {
@@ -100,8 +94,7 @@ namespace ChartManager.Data
             try
             {
                 var json = GetJson();
-                using var stream = File.Create(TempPath);
-                JsonSerializer.Serialize(stream, json, Utils.JsonOptions);
+                SystemManager.WriteToTemp(Chart, CinemaFile, json);
             }
             catch (Exception ex)
             {
@@ -114,7 +107,7 @@ namespace ChartManager.Data
             try
             {
                 var json = GetJson();
-                SystemManager.WriteToAlbum(Chart.Album, "cinema.json", json.ToJsonString(Utils.JsonOptions));
+                SystemManager.WriteToAlbum(Chart.Album, CinemaFile, json);
             }
             catch (Exception ex)
             {

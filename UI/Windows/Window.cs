@@ -31,9 +31,9 @@ namespace ChartManager.UI.Windows
 
         protected void RemoveButtons()
         {
-            foreach (var button in Base.ForumObjects)
+            while (Base.ForumObjects.Count > 0)
             {
-                RemoveButton(button);
+                RemoveButton(Base.ForumObjects[0]);
             }
         }
 
