@@ -27,6 +27,16 @@ namespace ChartManager.UI.Windows
             }
         }
 
+        protected void UpdateBanner(string bannerName) => UpdateBanner(AssetManager.GetImageAsset("Banners." + bannerName));
+        protected void UpdateBanner(ImageAsset banner)
+        {
+            Banner = banner;
+            foreach (var button in Base.ForumObjects)
+            {
+                button.Texture = Banner.Texture;
+            }
+        }
+
         internal abstract void CreateButtons();
 
         protected void RemoveButtons()
@@ -125,10 +135,7 @@ namespace ChartManager.UI.Windows
             HasBackButton = hasBackButton;
             ButtonsWindows = new();
 
-            if (bannerName != null)
-            {
-                Banner = AssetManager.GetImageAsset("Banners." + bannerName);
-            }
+            if (bannerName != null) UpdateBanner(bannerName);
 
             Base = new();
             Base.AutoReset = true;

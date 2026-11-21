@@ -8,14 +8,6 @@ namespace ChartManager.UI.Windows
 {
     internal class MapsWindow : Window
     {
-        private static readonly Dictionary<int, string> DifficultyNames = new()
-        {
-            [1] = "Easy",
-            [2] = "Hard",
-            [3] = "Master",
-            [4] = "Hidden",
-            [5] = "Touhou"
-        };
         internal Chart CurrentChart => UIManager.ChartWindow.CurrentChart;
         private Dictionary<ForumObject, ChartMap> ButtonsMaps;
 
@@ -23,6 +15,15 @@ namespace ChartManager.UI.Windows
         {
             RemoveButtons();
             CreateButtons();
+
+            var content = string.Empty;
+            foreach (var (diff, map) in CurrentChart.Maps)
+            {
+                content += map.ToString() + "\n";
+            }
+
+            UpdateContent(content);
+            UpdateBanner(UIManager.ChartWindow.Banner);
 
             base.Show();
         }
@@ -33,7 +34,7 @@ namespace ChartManager.UI.Windows
 
             foreach (var (diff, map) in CurrentChart.Maps)
             {
-                var button = AddButton(DifficultyNames[diff]);
+                var button = AddButton($"{Utils.DifficultyNames[diff]} {map.Level}★");
                 ButtonsMaps.Add(button, map);
             }
         }

@@ -1,4 +1,5 @@
 ﻿using ChartManager.Static;
+using UnityEngine;
 
 namespace ChartManager.Data.Charts
 {
@@ -13,6 +14,14 @@ namespace ChartManager.Data.Charts
         internal NoteSpeed InitialSpeed;
         internal Scene InitialScene;
         internal float InitialBPM;
+
+        public override string ToString()
+        {
+            return $"<color=#{Utils.ColorToHex(Color.white)}>| map{Difficulty}.bms |</color>\n"
+                    + Utils.GetNiceLine("Difficulty", $"{Utils.DifficultyNames[Difficulty]} {Level}★", Palette.Yellow1)
+                    + Utils.GetNiceLine("Level Designer", LevelDesigner, Palette.Yellow1)
+                    + Utils.GetNiceLine("Initial Speed", ((byte)InitialSpeed).ToString(), Palette.Yellow1);
+        }
 
         private void RefreshExtra()
         {

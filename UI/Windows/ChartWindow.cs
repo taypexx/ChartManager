@@ -49,6 +49,7 @@ namespace ChartManager.UI.Windows
 
             Title = new(CurrentChart.Info.Name);
             UpdateContent(CurrentChart.Info.ToString());
+            UpdateBanner(CurrentChart.Info.BaseScene.ToString() + ".png");
 
             base.Show();
         }
@@ -98,7 +99,7 @@ namespace ChartManager.UI.Windows
             DeleteButton = AddButton("< Delete>");
         }
 
-        internal ChartWindow() : base("Chart Editor", "ChartWindow.png", false)
+        internal ChartWindow() : base("Chart Editor", null, false)
         {
             SaveConfirmation = new("Saving", "Save the chart? This action will overwrite existing data.", OnSaveConfirm, Show);
             UnsavedConfirmation = new("Unsaved progress", "You have unsaved changes. Would you like to exit?", base.Close, Show);

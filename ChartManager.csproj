@@ -25,7 +25,18 @@
   </Target>
 
   <ItemGroup>
-    <None Remove="Assets\Banners\ChartWindow.png" />
+    <None Remove="Assets\Banners\AprilFools.png" />
+    <None Remove="Assets\Banners\Candyland.png" />
+    <None Remove="Assets\Banners\Castle.png" />
+    <None Remove="Assets\Banners\DJMAX.png" />
+    <None Remove="Assets\Banners\GrooveCoaster.png" />
+    <None Remove="Assets\Banners\Miku.png" />
+    <None Remove="Assets\Banners\Oriental.png" />
+    <None Remove="Assets\Banners\Oriental2.png" />
+    <None Remove="Assets\Banners\RainyNight.png" />
+    <None Remove="Assets\Banners\Retrocity.png" />
+    <None Remove="Assets\Banners\SpaceStation.png" />
+    <None Remove="Assets\Banners\Touhou.png" />
     <None Remove="Assets\Icons\Back.png" />
     <None Remove="Assets\Icons\Cross.png" />
     <None Remove="Assets\Icons\List.png" />
@@ -68,7 +79,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Banners\ChartWindow.png" />
+    <EmbeddedResource Include="Assets\Banners\AprilFools.png" />
+    <EmbeddedResource Include="Assets\Banners\Candyland.png" />
+    <EmbeddedResource Include="Assets\Banners\Castle.png" />
+    <EmbeddedResource Include="Assets\Banners\DJMAX.png" />
+    <EmbeddedResource Include="Assets\Banners\GrooveCoaster.png" />
+    <EmbeddedResource Include="Assets\Banners\Miku.png" />
+    <EmbeddedResource Include="Assets\Banners\Oriental.png" />
+    <EmbeddedResource Include="Assets\Banners\Oriental2.png" />
+    <EmbeddedResource Include="Assets\Banners\RainyNight.png" />
+    <EmbeddedResource Include="Assets\Banners\Retrocity.png" />
+    <EmbeddedResource Include="Assets\Banners\SpaceStation.png" />
+    <EmbeddedResource Include="Assets\Banners\Touhou.png" />
     <EmbeddedResource Include="Assets\Icons\Back.png" />
     <EmbeddedResource Include="Assets\Icons\Cross.png" />
     <EmbeddedResource Include="Assets\Icons\List.png" />

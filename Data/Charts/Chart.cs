@@ -12,6 +12,7 @@ namespace ChartManager.Data.Charts
     internal class Chart
     {
         private const string HitsoundsPath = $"{Main.ModName}.Assets.Template.WAVs.";
+        private FileSystemWatcher MapWatcher;
 
         internal Album Album;
         internal MusicInfo MusicInfo => GlobalDataBase.dbMusicTag.GetMusicInfoFromAll(Album.Uid);
@@ -30,11 +31,62 @@ namespace ChartManager.Data.Charts
 
         internal DirectoryInfo GetTempFolder()
         {
-            if (TempFolder == null)
+            if (TempFolder == null || !TempFolder.Exists)
             {
-                CopyAlbumFiles();
+                try
+                {
+                    var folder = SystemManager.MainDirectory.CreateSubdirectory(Album.AlbumName);
+
+                    switch (Album)
+                    {
+                        case ArchiveAlbum:
+                            ZipFile.ExtractToDirectory(Album.Path, folder.FullName, overwriteFiles: true);
+                            break;
+                        case PackAlbum:
+                            using (var mdp = ZipFile.OpenRead(Album.Path))
+                            {
+                                using (var openedMdm = Utils.GetNestedZip(mdp, ((PackAlbum)Album).PackAlbumName + ".mdm", ZipArchiveMode.Read))
+                                {
+                                    openedMdm.ExtractToDirectory(folder.FullName, overwriteFiles: true);
+                                }
+                            }
+                            break;
+                        case FolderAlbum:
+                            foreach (string file in Directory.GetFiles(Album.Path))
+                            {
+                                string destination = Path.Combine(folder.FullName, Path.GetFileName(file));
+                                File.Copy(file, destination, overwrite: true);
+                            }
+                            break;
+                        default:
+                            throw new Exception("Unknown album type.");
+                    }
+
+                    TempFolder = folder;
+
+                    if (MapWatcher != null) MapWatcher.Dispose();
+                    MapWatcher = new(TempFolder.FullName);
+                    MapWatcher.NotifyFilter = NotifyFilters.LastWrite;
+                    MapWatcher.Changed += OnTempMapUpdated;
+                    MapWatcher.Filter = "map?.bms";
+                    MapWatcher.EnableRaisingEvents = true;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Failed to copy album files of the {Album.AlbumName}: {ex}");
+                }
             }
             return TempFolder;
+        }
+
+        private void OnTempMapUpdated(object sender, FileSystemEventArgs args)
+        {
+            try
+            {
+                var map = Maps.Values.First(m => m.BmsName == args.Name);
+                map.RefreshFromTemp();
+            }
+            catch {}
         }
 
         internal void Save()
@@ -63,45 +115,6 @@ namespace ChartManager.Data.Charts
         {
             MainManager.RemoveChart(this);
             File.Delete(Album.Path);
-        }
-
-        private void CopyAlbumFiles()
-        {
-            try
-            {
-                var folder = SystemManager.MainDirectory.CreateSubdirectory(Album.AlbumName);
-
-                switch (Album)
-                {
-                    case ArchiveAlbum:
-                        ZipFile.ExtractToDirectory(Album.Path, folder.FullName, overwriteFiles: true);
-                        break;
-                    case PackAlbum:
-                        using (var mdp = ZipFile.OpenRead(Album.Path))
-                        {
-                            using (var openedMdm = Utils.GetNestedZip(mdp, ((PackAlbum)Album).PackAlbumName + ".mdm", ZipArchiveMode.Read))
-                            {
-                                openedMdm.ExtractToDirectory(folder.FullName, overwriteFiles: true);
-                            }
-                        }
-                        break;
-                    case FolderAlbum:
-                        foreach (string file in Directory.GetFiles(Album.Path))
-                        {
-                            string destination = Path.Combine(folder.FullName, Path.GetFileName(file));
-                            File.Copy(file, destination, overwrite: true);
-                        }
-                        break;
-                    default:
-                        throw new Exception("Unknown album type.");
-                }
-
-                TempFolder = folder;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Failed to copy album files of the {Album.AlbumName}: {ex}");
-            }
         }
 
         private void CopyHitsounds()
@@ -263,6 +276,11 @@ namespace ChartManager.Data.Charts
                 }
             }
             else OnWebsite = false;
+        }
+
+        internal void Dispose()
+        {
+            if (MapWatcher != null) MapWatcher.Dispose();
         }
 
         internal Chart(Album album)

@@ -27,21 +27,22 @@ namespace ChartManager.Data.Charts
 
         public override string ToString()
         {
-            var str = Name;
+            var str = $"<b>{Name}";
             if (NameRomanized != null)
             {
                 str += $" ({NameRomanized})";
             }
-            str += $" - {Author}\n"
-            + $"[ BPM ]: {BPM}\n"
-            + $"[ Scene ]: {BaseScene.ToString()}\n"
-            + $"[ Tags ]: {(Tags.Length == 0 ? "-" : string.Join(", ", Tags))}\n"
-            + $"[ Level Designers ]: {string.Join(',', LevelDesigners)}\n"
-            + $"[ Difficulties ]: {string.Join(',', Difficulties)}\n"
-            + $"[ Hidden Unlock Method ]: {HiddenUnlockMethod.ToString()}\n"
-            + $"[ Hidden Unlock Type ]: {HiddenUnlockType.ToString()}\n"
-            + $"[ Hidden Unlock Message ]: {HiddenUnlockMessage.ToString()}\n"
-            + $"[ Scene Egg ]: {SceneEgg.ToString()}";
+            str += $" - {Author}</b>\n\n"
+
+            + Utils.GetNiceLine("BPM", BPM, Palette.Yellow1)
+            + Utils.GetNiceLine("Scene", $"{Utils.StringFromScene(BaseScene)} ({BaseScene.ToString()})", Palette.Yellow1)
+            + Utils.GetNiceLine("Tags", Tags.Length == 0 ? "-" : string.Join(", ", Tags), Palette.Yellow1)
+            + Utils.GetNiceLine("Level Designers", LevelDesigners.Values.All(d => d == LevelDesigners.Values.First()) ? LevelDesigners.Values.First() : string.Join(", ", LevelDesigners.Values), Palette.Yellow1)
+            + Utils.GetNiceLine("Difficulties", string.Join(", ", Difficulties.Values.Where(d => d != "0").Select(d => d += "★")), Palette.Yellow1)
+            + Utils.GetNiceLine("Hidden Unlock Method", HiddenUnlockMethod.ToString(), Palette.Yellow1)
+            + Utils.GetNiceLine("Hidden Unlock Type", $"{(sbyte)HiddenUnlockType} ({HiddenUnlockType.ToString()})", Palette.Yellow1)
+            + Utils.GetNiceLine("Hidden Unlock Message", HiddenUnlockMessage, Palette.Yellow1)
+            + Utils.GetNiceLine("Scene Egg", SceneEgg.ToString(), Palette.Yellow1);
             return str;
         }
 
@@ -53,7 +54,7 @@ namespace ChartManager.Data.Charts
                 ["name_romanized"] = NameRomanized,
                 ["author"] = Author,
                 ["bpm"] = BPM,
-                ["scene"] = $"scene_{((byte)BaseScene).ToString("D2")}",
+                ["scene"] = Utils.StringFromScene(BaseScene),
                 ["searchTags"] = new JsonArray(Tags.Select(t => JsonValue.Create(t)).ToArray()),
                 ["levelDesigner"] = LevelDesigners[0],
                 ["levelDesigner1"] = LevelDesigners[1],
@@ -136,14 +137,16 @@ namespace ChartManager.Data.Charts
                 if (root.TryGetProperty("levelDesigner" + i, out var designer))
                 {
                     var str = designer.GetString();
-                    LevelDesigners[i] = string.IsNullOrWhiteSpace(str) ? null : str;
+                    LevelDesigners[i] = string.IsNullOrWhiteSpace(str) ? LevelDesigners[0] : str;
                 }
+                else LevelDesigners[i] = LevelDesigners[0];
 
                 if (root.TryGetProperty("difficulty" + i, out var diff))
                 {
                     var str = diff.GetString();
-                    Difficulties[i] = string.IsNullOrWhiteSpace(str) ? null : str;
+                    Difficulties[i] = string.IsNullOrWhiteSpace(str) ? "0" : str;
                 }
+                else Difficulties[i] = "0";
             }
 
             if (root.TryGetProperty("hideBmsMode", out var hideBmsMode))

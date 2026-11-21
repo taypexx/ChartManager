@@ -13,6 +13,15 @@ namespace ChartManager.Static
     {
         public static Font NormalFont = Addressables.LoadAssetAsync<Font>("Normal").WaitForCompletion();
 
+        public static readonly Dictionary<int, string> DifficultyNames = new()
+        {
+            [1] = "Easy",
+            [2] = "Hard",
+            [3] = "Master",
+            [4] = "Hidden",
+            [5] = "Touhou"
+        };
+
         public static JsonSerializerOptions JsonOptions = new JsonSerializerOptions
         {
             WriteIndented = true,
@@ -27,6 +36,19 @@ namespace ChartManager.Static
             using var mdmStream = mdm.Open();
             var openedMdm = new ZipArchive(mdmStream, mode, false);
             return openedMdm;
+        }
+
+        public static string GetNiceLine(string title, string value, Color? titleColor = null, Color? valueColor = null)
+        {
+            if (titleColor == null) titleColor = Color.white;
+            if (valueColor == null) valueColor = Color.white;
+
+            return $"<color={ColorToHex((Color)titleColor)}>[ {title} ]:</color> <color={ColorToHex((Color)valueColor)}>{value}</color>\n";
+        }
+
+        public static string StringFromScene(Scene scene)
+        {
+            return $"scene_{((byte)scene).ToString("D2")}";
         }
 
         public static Scene SceneFromString(string scene)
@@ -81,6 +103,15 @@ namespace ChartManager.Static
             if (!Int32.TryParse(num, out int num_)) return null;
             if (min != null && max != null && (num_ < min || num_ > max)) return null;
             return num_;
+        }
+
+        public static string ColorToHex(Color color)
+        {
+            int r = Mathf.RoundToInt(color.r * 255f);
+            int g = Mathf.RoundToInt(color.g * 255f);
+            int b = Mathf.RoundToInt(color.b * 255f);
+
+            return $"#{r:X2}{g:X2}{b:X2}".ToLowerInvariant();
         }
 
         public static void StartProcess(string fileName)

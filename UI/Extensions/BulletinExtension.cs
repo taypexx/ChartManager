@@ -25,11 +25,9 @@ namespace ChartManager.UI.Extensions
         internal static void SetWindow(Window window, string title, bool hasBackButton)
         {
             PreviousWindow = CurrentWindow;
-
+            CurrentWindow = window;
             Title.text = title;
             Toggle(true, hasBackButton);
-
-            CurrentWindow = window;
         }
 
         internal static void CloseWindow()
@@ -109,6 +107,7 @@ namespace ChartManager.UI.Extensions
             BackButton = CreateTopButton(AssetManager.GetImageAsset("Icons.Back.png").Sprite, new(40f, 40f), new Action(() =>
             {
                 if (PreviousWindow == null) return;
+                if (CurrentWindow != null) CurrentWindow.Close();
                 PreviousWindow.Show();
             }));
 

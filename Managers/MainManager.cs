@@ -13,6 +13,7 @@ namespace ChartManager.Managers
             var key = chart.Album.Uid;
             if (!Charts.ContainsKey(key)) return;
             Charts.Remove(key);
+            chart.Dispose();
         }
 
         internal static void InitCharts()
