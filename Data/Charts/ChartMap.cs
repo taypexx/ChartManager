@@ -17,10 +17,10 @@ internal class ChartMap
 
     public override string ToString()
     {
-        return $"<color={Utils.ColorToHex(Color.white)}>| map{Difficulty}.bms |</color>\n"
-                + Utils.GetNiceLine("Difficulty", $"{Utils.DifficultyNames[Difficulty]} {Level}★", Color.white, Palette.Yellow1)
-                + Utils.GetNiceLine("Level Designer", LevelDesigner, Color.white, Palette.Yellow1)
-                + Utils.GetNiceLine("Initial Speed", ((byte)InitialSpeed).ToString(), Color.white, Palette.Yellow1);
+        return $"<color={Utils.ColorToHex(Color.white)}>map{Difficulty}.bms</color>\n"
+                + Utils.GetNiceLine("Difficulty", $"{Utils.DifficultyNames[Difficulty]} {Level}★", Color.gray, Color.white)
+                + Utils.GetNiceLine("Level Designer", LevelDesigner, Color.gray, Color.white)
+                + Utils.GetNiceLine("Initial Speed", ((byte)InitialSpeed).ToString(), Color.gray, Color.white);
     }
 
     private void RefreshExtra()

@@ -1,9 +1,12 @@
 ﻿using ChartManager.Data.Charts;
 using ChartManager.Managers;
+using ChartManager.Static;
 using ChartManager.UI.Extensions;
+using PopupLib.UI;
 using PopupLib.UI.Components;
 using PopupLib.UI.Windows.Abstract;
 using PopupLib.UI.Windows.Interfaces;
+using UnityEngine;
 
 namespace ChartManager.UI.Windows;
 
@@ -17,7 +20,7 @@ internal class ChartWindow : Window
     private ForumObject DeleteButton;
 
     private readonly Confirmation SaveConfirmation;
-    private readonly Confirmation UnsavedConfirmation;
+    internal readonly Confirmation UnsavedConfirmation;
     private readonly Confirmation DeleteConfirmation;
 
     internal Chart CurrentChart { get; private set; }
@@ -25,9 +28,17 @@ internal class ChartWindow : Window
 
     private void OnSaveConfirm()
     {
-        CurrentChart.Save();
+        CurrentChart.SaveChanges();
         EditSaved = true;
         Show();
+        PopupUtils.ShowInfo("Saved!");
+    }
+
+    private void OnUnsavedExit()
+    {
+        CurrentChart.RevertChanges();
+        EditSaved = true;
+        base.Close();
     }
 
     private void OnDeleteConfirm()
@@ -37,17 +48,18 @@ internal class ChartWindow : Window
 
         // TODO: move to the closest chart instead of going back to the first
         base.Close();
+        PopupUtils.ShowInfo("Deleted!");
     }
 
     internal void Show(Chart? chart = null)
     {
-        if (chart != null)
+        if (chart != null && chart != CurrentChart)
         {
             CurrentChart = chart;
             EditSaved = true;
         }
 
-        Title = new(CurrentChart.Info.Name);
+        Title = new(CurrentChart.Info.Name + (EditSaved ? string.Empty : "*") );
         UpdateContent(CurrentChart.Info.ToString());
         UpdateBanner(CurrentChart.Info.BaseScene.ToString() + ".png");
 
@@ -76,13 +88,13 @@ internal class ChartWindow : Window
     {
         var button = Base.ForumObjects[objectIndex];
 
-        if (button == SaveButton)
+        if (button == InfoButton)
         {
-            SaveConfirmation.Show();
-        }
-        else if (button == DeleteButton)
-        {
-            DeleteConfirmation.Show();
+            PopupUtils.ShowInfo("Opening info.json...");
+            Utils.StartProcess(Path.Combine(CurrentChart.GetTempFolder().FullName, "info.json"));
+            EditSaved = false;
+            Refresh();
+            return;
         }
 
         base.OnClick(_, objectIndex);
@@ -94,14 +106,14 @@ internal class ChartWindow : Window
         InfoButton = AddButton("Info");
         MapsButton = AddButton("Maps", UIManager.MapsWindow);
         CinemaButton = AddButton("Cinema");
-        SaveButton = AddButton("< Save >");
-        DeleteButton = AddButton("< Delete>");
+        SaveButton = AddButton($"<color={Utils.ColorToHex(Color.white)}>< Save ></color>", SaveConfirmation);
+        DeleteButton = AddButton($"<color={Utils.ColorToHex(Color.red)}>< Delete></color>", DeleteConfirmation);
     }
 
     internal ChartWindow() : base("Chart Editor", null, false)
     {
         SaveConfirmation = new("Saving", "Save the chart? This action will overwrite existing data.", OnSaveConfirm, Show);
-        UnsavedConfirmation = new("Unsaved progress", "You have unsaved changes. Would you like to exit?", base.Close, Show);
+        UnsavedConfirmation = new("Unsaved progress", "You have unsaved changes. Would you like to exit?", OnUnsavedExit, Show);
         DeleteConfirmation = new("Deleting", "This chart will be deleted forever. Would you like to proceed?", OnDeleteConfirm, Show);
 
         EditSaved = true;

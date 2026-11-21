@@ -25,7 +25,7 @@ internal class Chart
 
     private bool? OnWebsite;
     private string? WebsiteId;
-    private bool? IsRanked;
+    internal bool? IsRanked;
 
     private DirectoryInfo TempFolder;
 
@@ -89,7 +89,25 @@ internal class Chart
         catch { }
     }
 
-    internal void Save()
+    internal void RevertChanges()
+    {
+        Info.RefreshFromAlbum();
+        Info.SaveToTemp();
+
+        foreach (var (_, map) in Maps)
+        {
+            map.RefreshFromAlbum();
+            map.SaveToTemp();
+        }
+
+        if (HasCinema)
+        {
+            Cinema.RefreshFromAlbum();
+            Cinema.SaveToTemp();
+        }
+    }
+
+    internal void SaveChanges()
     {
         // NOTE: info must be pulled from the temp folder before saving so this save may not save anything at all
 

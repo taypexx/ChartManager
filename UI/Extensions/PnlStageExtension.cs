@@ -5,6 +5,7 @@ using CustomAlbums.Managers;
 using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.UI.Panels;
+using PopupLib.UI;
 using UnityEngine;
 
 namespace ChartManager.UI.Extensions;
@@ -29,7 +30,7 @@ internal static class PnlStageExtension
             new Vector2(1f, 1f),
             () =>
             {
-
+                PopupUtils.ShowInfo("Coming soon...");
             }
         );
         CreateButton.Update(Palette.Yellow3, Palette.Yellow1);

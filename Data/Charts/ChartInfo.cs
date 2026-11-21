@@ -33,17 +33,24 @@ internal class ChartInfo
         {
             str += $" ({NameRomanized})";
         }
-        str += $" - {Author}</color>\n\n"
+        str += $" - {Author}</color>";
 
-        + Utils.GetNiceLine("BPM", BPM, Color.white, Palette.Yellow1)
-        + Utils.GetNiceLine("Scene", $"{Utils.StringFromScene(BaseScene)} ({BaseScene})", Color.white, Palette.Yellow1)
-        + Utils.GetNiceLine("Tags", Tags.Length == 0 ? "-" : string.Join(", ", Tags), Color.white, Palette.Yellow1)
-        + Utils.GetNiceLine("Level Designers", LevelDesigners.Values.All(d => d == LevelDesigners.Values.First()) ? LevelDesigners.Values.First() : string.Join(", ", LevelDesigners.Values), Color.white, Palette.Yellow1)
-        + Utils.GetNiceLine("Difficulties", string.Join(", ", Difficulties.Values.Where(d => d != "0").Select(d => d += "★")), Color.white, Palette.Yellow1)
-        + Utils.GetNiceLine("Hidden Unlock Method", HiddenUnlockMethod.ToString(), Color.white, Palette.Yellow1)
-        + Utils.GetNiceLine("Hidden Unlock Type", $"{(sbyte)HiddenUnlockType} ({HiddenUnlockType})", Color.white, Palette.Yellow1)
-        + Utils.GetNiceLine("Hidden Unlock Message", HiddenUnlockMessage, Color.white, Palette.Yellow1)
-        + Utils.GetNiceLine("Scene Egg", SceneEgg.ToString(), Color.white, Palette.Yellow1);
+        if (Chart.IsOnWebsite())
+        {
+            var ranked = (bool)Chart.IsRanked;
+            str += $" <color={Utils.ColorToHex(ranked ? Color.green : Color.red)}>({(ranked ? "Ranked" : "Unranked")})</color>";
+        }
+        
+        str += "\n\n"
+        + Utils.GetNiceLine("BPM", BPM, Color.gray, Color.white)
+        + Utils.GetNiceLine("Scene", $"{Utils.StringFromScene(BaseScene)} ({BaseScene})", Color.gray, Color.white)
+        + Utils.GetNiceLine("Tags", Tags.Length == 0 ? "-" : string.Join(", ", Tags), Color.gray, Color.white)
+        + Utils.GetNiceLine("Level Designers", LevelDesigners.Values.All(d => d == LevelDesigners.Values.First()) ? LevelDesigners.Values.First() : string.Join(", ", LevelDesigners.Values), Color.gray, Color.white)
+        + Utils.GetNiceLine("Difficulties", string.Join(" | ", Difficulties.Values.Where(d => d != "0").Select(d => d += "★")), Color.gray, Color.white)
+        + Utils.GetNiceLine("Hidden Unlock Method", HiddenUnlockMethod.ToString(), Color.gray, Color.white)
+        + Utils.GetNiceLine("Hidden Unlock Type", $"{(sbyte)HiddenUnlockType} ({HiddenUnlockType})", Color.gray, Color.white)
+        + Utils.GetNiceLine("Hidden Unlock Message", HiddenUnlockMessage, Color.gray, Color.white)
+        + Utils.GetNiceLine("Scene Egg", SceneEgg.ToString(), Color.gray, Color.white);
         return str;
     }
 
@@ -71,7 +78,7 @@ internal class ChartInfo
             ["hideBmsMode"] = HiddenUnlockMethod.ToString(),
             ["hideBmsDifficulty"] = ((sbyte)HiddenUnlockType).ToString(),
             ["hideBmsMessage"] = HiddenUnlockMessage,
-            ["sceneEgg"] = SceneEgg == CustomAlbums.Data.SceneEgg.SceneEggs.None ? null : SceneEgg.ToString()
+            ["sceneEgg"] = SceneEgg.ToString()
         };
         return obj.ToJsonString(Utils.JsonOptions);
     }

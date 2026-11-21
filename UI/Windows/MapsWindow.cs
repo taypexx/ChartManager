@@ -1,14 +1,18 @@
 ﻿using ChartManager.Data.Charts;
 using ChartManager.Managers;
 using ChartManager.Static;
+using ChartManager.UI.Extensions;
+using PopupLib.UI;
 using PopupLib.UI.Components;
+using PopupLib.UI.Windows.Abstract;
 using PopupLib.UI.Windows.Interfaces;
 
 namespace ChartManager.UI.Windows;
 
 internal class MapsWindow : Window
 {
-    internal Chart CurrentChart => UIManager.ChartWindow.CurrentChart;
+    private ChartWindow ChartWindow => UIManager.ChartWindow;
+    internal Chart CurrentChart => ChartWindow.CurrentChart;
     private readonly Dictionary<ForumObject, ChartMap> ButtonsMaps;
 
     internal override void Show()
@@ -23,7 +27,7 @@ internal class MapsWindow : Window
         }
 
         UpdateContent(content);
-        UpdateBanner(UIManager.ChartWindow.Banner);
+        UpdateBanner(ChartWindow.Banner);
 
         base.Show();
     }
@@ -39,14 +43,28 @@ internal class MapsWindow : Window
         }
     }
 
+    internal override void OnShow(BaseWindow _)
+    {
+        BulletinExtension.ToggleCover(true, CurrentChart.Assets.Cover);
+        base.OnShow(_);
+    }
+
+    internal override void OnClose(BaseWindow _)
+    {
+        BulletinExtension.ToggleCover(false);
+        base.OnClose(_);
+    }
+
     internal override void OnClick(IListWindow _, int objectIndex)
     {
         var button = Base.ForumObjects[objectIndex];
 
         if (ButtonsMaps.TryGetValue(button, out var map))
         {
+            PopupUtils.ShowInfo($"Opening {map.BmsName}...");
             Utils.StartProcess(Path.Combine(map.Chart.GetTempFolder().FullName, map.BmsName));
-            UIManager.ChartWindow.EditSaved = false;
+            ChartWindow.EditSaved = false;
+            return;
         }
 
         base.OnClick(_, objectIndex);

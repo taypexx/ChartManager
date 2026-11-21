@@ -71,6 +71,7 @@ internal static class PnlMusicTagSelectPatch
         {
             var chart = MainManager.Charts[cell.musicInfo.uid];
             UIManager.ChartWindow.Show(chart);
+            return true;
         }
 
         return false;

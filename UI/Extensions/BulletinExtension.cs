@@ -32,7 +32,6 @@ internal static class BulletinExtension
 
     internal static void CloseWindow()
     {
-        CurrentWindow = null;
         Toggle(false);
     }
 

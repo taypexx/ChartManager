@@ -97,6 +97,9 @@ internal abstract class Window
         var windowToOpen = ButtonsWindows[button];
         switch (windowToOpen)
         {
+            case Confirmation:
+                ((Confirmation)windowToOpen).Show();
+                break;
             case Window:
                 ((Window)windowToOpen).Show();
                 break;
