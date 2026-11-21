@@ -1,30 +1,29 @@
 ﻿using UnityEngine;
 
-namespace ChartManager.Data
+namespace ChartManager.Data;
+
+internal sealed class ImageAsset
 {
-    internal sealed class ImageAsset
+    internal string Name { get; private set; }
+    internal Texture2D Texture { get; private set; }
+    internal Sprite Sprite { get; private set; }
+
+    internal ImageAsset(byte[] bytes, string name = "Image")
     {
-        internal string Name { get; private set; }
-        internal Texture2D Texture { get; private set; }
-        internal Sprite Sprite { get; private set; }
+        Name = name;
 
-        internal ImageAsset(byte[] bytes, string name = "Image")
+        // Creating the texture
+        Texture = new Texture2D(2, 2, TextureFormat.ARGB32, false)
         {
-            Name = name;
+            wrapMode = TextureWrapMode.MirrorOnce
+        };
+        _ = ImageConversion.LoadImage(Texture, bytes);
 
-            // Creating the texture
-            Texture = new Texture2D(2, 2, TextureFormat.ARGB32, false)
-            {
-                wrapMode = TextureWrapMode.MirrorOnce
-            };
-            ImageConversion.LoadImage(Texture, bytes);
+        // Creating the sprite
+        Sprite = Sprite.Create(Texture, new Rect(0, 0, Texture.width, Texture.height), new Vector2(0.5f, 0.5f));
 
-            // Creating the sprite
-            Sprite = Sprite.Create(Texture, new Rect(0, 0, Texture.width, Texture.height), new Vector2(0.5f, 0.5f));
-
-            // Prevent garbage collection
-            UnityEngine.Object.DontDestroyOnLoad(Texture);
-            UnityEngine.Object.DontDestroyOnLoad(Sprite);
-        }
+        // Prevent garbage collection
+        UnityEngine.Object.DontDestroyOnLoad(Texture);
+        UnityEngine.Object.DontDestroyOnLoad(Sprite);
     }
 }

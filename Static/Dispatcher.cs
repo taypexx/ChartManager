@@ -1,27 +1,25 @@
-﻿using ChartManager.Static;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
-namespace Multiplayer.Static
+namespace ChartManager.Static;
+
+internal static class Dispatcher
 {
-    internal static class Dispatcher
+    internal delegate void DispatcherCallbackDelegate();
+    private static readonly ConcurrentQueue<DispatcherCallbackDelegate> ThreadQueue = new();
+
+    internal static void Do(DispatcherCallbackDelegate del) => ThreadQueue.Enqueue(del);
+
+    internal static void Update()
     {
-        internal delegate void DispatcherCallbackDelegate();
-        private static readonly ConcurrentQueue<DispatcherCallbackDelegate> ThreadQueue = new();
-
-        internal static void Do(DispatcherCallbackDelegate del) => ThreadQueue.Enqueue(del);
-
-        internal static void Update()
+        while (ThreadQueue.TryDequeue(out var f))
         {
-            while (ThreadQueue.TryDequeue(out var f))
+            try
             {
-                try
-                {
-                    f?.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex.ToString());
-                }
+                f?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
             }
         }
     }
