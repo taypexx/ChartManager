@@ -27,6 +27,27 @@ internal class ChartWindow : Window
     internal Chart CurrentChart { get; private set; }
     internal bool EditSaved { get; set; }
 
+    internal void Show(Chart? chart = null)
+    {
+        if (chart != null && chart != CurrentChart)
+        {
+            CurrentChart = chart;
+            EditSaved = true;
+        }
+
+        Title = new(CurrentChart.Info.Name + (EditSaved ? string.Empty : "*"));
+        UpdateContent(CurrentChart.Info.ToString());
+        UpdateBanner(CurrentChart.Info.BaseScene.ToString() + ".png");
+
+        base.Show();
+    }
+
+    internal override void Close()
+    {
+        base.Close();
+        if (!EditSaved) UnsavedConfirmation.Show();
+    }
+
     private void OnSaveConfirm()
     {
         CurrentChart.SaveChanges();
@@ -56,27 +77,6 @@ internal class ChartWindow : Window
         base.Close();
         PopupUtils.ShowInfo("Deleted!");
         PnlStageExtension.Panel.SelectAllTagAndJumpToAssginIndex(prevUid);
-    }
-
-    internal void Show(Chart? chart = null)
-    {
-        if (chart != null && chart != CurrentChart)
-        {
-            CurrentChart = chart;
-            EditSaved = true;
-        }
-
-        Title = new(CurrentChart.Info.Name + (EditSaved ? string.Empty : "*") );
-        UpdateContent(CurrentChart.Info.ToString());
-        UpdateBanner(CurrentChart.Info.BaseScene.ToString() + ".png");
-
-        base.Show();
-    }
-
-    internal override void Close()
-    {
-        base.Close();
-        if (!EditSaved) UnsavedConfirmation.Show();
     }
 
     internal override void OnShow(BaseWindow _)

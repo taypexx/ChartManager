@@ -32,18 +32,6 @@ internal class MapsWindow : Window
         base.Show();
     }
 
-    internal override void OnShow(BaseWindow _)
-    {
-        BulletinExtension.ToggleCover(true, CurrentChart.Assets.Cover);
-        base.OnShow(_);
-    }
-
-    internal override void OnClose(BaseWindow _)
-    {
-        BulletinExtension.ToggleCover(false);
-        base.OnClose(_);
-    }
-
     internal override void OnClick(IListWindow _, int objectIndex)
     {
         var button = Base.ForumObjects[objectIndex];
@@ -57,6 +45,18 @@ internal class MapsWindow : Window
         }
 
         base.OnClick(_, objectIndex);
+    }
+
+    internal override void OnShow(BaseWindow _)
+    {
+        BulletinExtension.ToggleCover(true, CurrentChart.Assets.Cover);
+        base.OnShow(_);
+    }
+
+    internal override void OnClose(BaseWindow _)
+    {
+        BulletinExtension.ToggleCover(false);
+        base.OnClose(_);
     }
 
     internal override void CreateButtons()

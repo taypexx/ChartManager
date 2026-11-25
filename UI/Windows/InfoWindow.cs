@@ -1,10 +1,12 @@
 ﻿using ChartManager.Data.Charts;
 using ChartManager.Managers;
 using ChartManager.Static;
+using ChartManager.UI.Extensions;
 using ChartManager.UI.Windows.InfoWindows;
 using PopupLib.UI;
 using PopupLib.UI.Components;
 using PopupLib.UI.Windows;
+using PopupLib.UI.Windows.Abstract;
 using PopupLib.UI.Windows.Interfaces;
 using UnityEngine;
 
@@ -32,19 +34,22 @@ internal class InfoWindow : Window
     private InputWindow AuthorInput;
     private InputWindow BPMInput;
 
+    private SceneWindow SceneWindow;
     private TagsWindow TagsWindow;
+    private SceneEggWindow SceneEggWindow;
 
     internal override void Show()
     {
         if (CurrentInfo != null)
         {
             UpdateContent(CurrentInfo.ToString());
+            UpdateBanner(ChartWindow.Banner);
         }
 
         base.Show();
     }
 
-    private void OnNameInput(PopupLib.UI.Windows.Abstract.BaseWindow _)
+    private void OnNameInput(BaseWindow _)
     {
         if (NameInput.Result != null && CurrentInfo != null)
         {
@@ -54,7 +59,7 @@ internal class InfoWindow : Window
         Show();
     }
 
-    private void OnNameRomanizedInput(PopupLib.UI.Windows.Abstract.BaseWindow _)
+    private void OnNameRomanizedInput(BaseWindow _)
     {
         if (NameRomanizedInput.Result != null && CurrentInfo != null)
         {
@@ -64,7 +69,7 @@ internal class InfoWindow : Window
         Show();
     }
 
-    private void OnAuthorInput(PopupLib.UI.Windows.Abstract.BaseWindow _)
+    private void OnAuthorInput(BaseWindow _)
     {
         if (AuthorInput.Result != null && CurrentInfo != null)
         {
@@ -74,7 +79,7 @@ internal class InfoWindow : Window
         Show();
     }
 
-    private void OnBPMInput(PopupLib.UI.Windows.Abstract.BaseWindow _)
+    private void OnBPMInput(BaseWindow _)
     {
         if (BPMInput.Result != null && CurrentInfo != null)
         {
@@ -102,13 +107,25 @@ internal class InfoWindow : Window
         base.OnClick(_, objectIndex);
     }
 
+    internal override void OnShow(BaseWindow _)
+    {
+        BulletinExtension.ToggleCover(true, CurrentChart.Assets.Cover);
+        base.OnShow(_);
+    }
+
+    internal override void OnClose(BaseWindow _)
+    {
+        BulletinExtension.ToggleCover(false);
+        base.OnClose(_);
+    }
+
     internal override void CreateButtons()
     {
         NameButton = AddButton("Name", NameInput);
         NameRomanizedButton = AddButton("Name Romanized", NameRomanizedInput);
         AuthorButton = AddButton("Author", AuthorInput);
         BPMButton = AddButton("BPM", BPMInput);
-        SceneButton = AddButton("Scene");
+        SceneButton = AddButton("Scene", SceneWindow);
         TagsButton = AddButton("Tags", TagsWindow);
         MapsButton = AddButton("Manage Maps");
         HiddenButton = AddButton("Hidden Settings");
@@ -129,6 +146,12 @@ internal class InfoWindow : Window
         AuthorInput.OnCompletion += OnAuthorInput;
         BPMInput.OnCompletion += OnBPMInput;
 
+        SceneWindow = new();
+        SceneWindow.CreateButtons();
+
         TagsWindow = new();
+
+        SceneEggWindow = new();
+        SceneEggWindow.CreateButtons();
     }
 }

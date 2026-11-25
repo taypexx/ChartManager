@@ -13,6 +13,7 @@ internal class Chart
 {
     private const string HitsoundsPath = $"{Main.ModName}.Assets.Template.WAVs.";
     private FileSystemWatcher MapWatcher;
+    private FileSystemWatcher InfoWatcher;
 
     internal Album Album;
     internal MusicInfo MusicInfo => GlobalDataBase.dbMusicTag.GetMusicInfoFromAll(Album.Uid);
@@ -62,6 +63,15 @@ internal class Chart
 
                 TempFolder = folder;
 
+                InfoWatcher?.Dispose();
+                InfoWatcher = new(TempFolder.FullName)
+                {
+                    NotifyFilter = NotifyFilters.LastWrite
+                };
+                InfoWatcher.Changed += OnTempInfoUpdated;
+                InfoWatcher.Filter = "info.json";
+                InfoWatcher.EnableRaisingEvents = true;
+
                 MapWatcher?.Dispose();
                 MapWatcher = new(TempFolder.FullName)
                 {
@@ -77,6 +87,11 @@ internal class Chart
             }
         }
         return TempFolder;
+    }
+
+    private void OnTempInfoUpdated(object sender, FileSystemEventArgs args)
+    {
+        Info.RefreshFromTemp();
     }
 
     private void OnTempMapUpdated(object sender, FileSystemEventArgs args)
