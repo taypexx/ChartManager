@@ -13,6 +13,7 @@ internal static class UIManager
 
     internal static ChartWindow ChartWindow;
     internal static MapsWindow MapsWindow;
+    internal static InfoWindow InfoWindow;
 
     /// <summary>
     /// Loads the UI when the main UI scene loads.
@@ -27,8 +28,10 @@ internal static class UIManager
     {
         ChartWindow = new();
         MapsWindow = new();
+        InfoWindow = new();
 
         ChartWindow.CreateButtons();
         MapsWindow.CreateButtons();
+        InfoWindow.CreateButtons();
     }
 }

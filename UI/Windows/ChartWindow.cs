@@ -2,6 +2,7 @@
 using ChartManager.Managers;
 using ChartManager.Static;
 using ChartManager.UI.Extensions;
+using CustomAlbums.Managers;
 using PopupLib.UI;
 using PopupLib.UI.Components;
 using PopupLib.UI.Windows.Abstract;
@@ -43,12 +44,18 @@ internal class ChartWindow : Window
 
     private void OnDeleteConfirm()
     {
+        var prevMusicIndex = CurrentChart.MusicInfo.musicIndex - 1;
+        if (prevMusicIndex < 0) prevMusicIndex = 2;
+
+        var prevUid = $"{AlbumManager.Uid}-{prevMusicIndex}";
+
         CurrentChart.Delete();
         CurrentChart = null;
 
         // TODO: move to the closest chart instead of going back to the first
         base.Close();
         PopupUtils.ShowInfo("Deleted!");
+        PnlStageExtension.Panel.SelectAllTagAndJumpToAssginIndex(prevUid);
     }
 
     internal void Show(Chart? chart = null)
@@ -84,26 +91,10 @@ internal class ChartWindow : Window
         base.OnClose(_);
     }
 
-    internal override void OnClick(IListWindow _, int objectIndex)
-    {
-        var button = Base.ForumObjects[objectIndex];
-
-        if (button == InfoButton)
-        {
-            PopupUtils.ShowInfo("Opening info.json...");
-            Utils.StartProcess(Path.Combine(CurrentChart.GetTempFolder().FullName, "info.json"));
-            EditSaved = false;
-            Refresh();
-            return;
-        }
-
-        base.OnClick(_, objectIndex);
-    }
-
     internal override void CreateButtons()
     {
         AssetsButton = AddButton("Assets");
-        InfoButton = AddButton("Info");
+        InfoButton = AddButton("Info", UIManager.InfoWindow);
         MapsButton = AddButton("Maps", UIManager.MapsWindow);
         CinemaButton = AddButton("Cinema");
         SaveButton = AddButton($"<color={Utils.ColorToHex(Color.white)}>< Save ></color>", SaveConfirmation);

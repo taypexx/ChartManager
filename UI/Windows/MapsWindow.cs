@@ -32,17 +32,6 @@ internal class MapsWindow : Window
         base.Show();
     }
 
-    internal override void CreateButtons()
-    {
-        if (CurrentChart == null) return;
-
-        foreach (var (diff, map) in CurrentChart.Maps)
-        {
-            var button = AddButton($"{Utils.DifficultyNames[diff]} {map.Level}★");
-            ButtonsMaps.Add(button, map);
-        }
-    }
-
     internal override void OnShow(BaseWindow _)
     {
         BulletinExtension.ToggleCover(true, CurrentChart.Assets.Cover);
@@ -68,6 +57,17 @@ internal class MapsWindow : Window
         }
 
         base.OnClick(_, objectIndex);
+    }
+
+    internal override void CreateButtons()
+    {
+        if (CurrentChart == null) return;
+
+        foreach (var (diff, map) in CurrentChart.Maps)
+        {
+            var button = AddButton($"{Utils.DifficultyNames[diff]} {map.Level}★");
+            ButtonsMaps.Add(button, map);
+        }
     }
 
     internal MapsWindow() : base("Maps", null, true)

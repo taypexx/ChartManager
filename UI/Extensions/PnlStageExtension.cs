@@ -81,9 +81,10 @@ internal static class PnlStageUpdatePatch
 {
     private static void Postfix(PnlStage __instance)
     {
-        if (PnlStageExtension.EditButton == null) return;
-
-        // Disable edit button if the selected cell is random/non-custom
-        PnlStageExtension.EditButton.GameObject.SetActive(GlobalDataBase.dbMusicTag.CurMusicInfo().albumIndex == AlbumManager.Uid);
+        if (PnlStageExtension.EditButton != null)
+        {
+            // Disable edit button if the selected cell is random/non-custom
+            PnlStageExtension.EditButton.GameObject.SetActive(GlobalDataBase.dbMusicTag.CurMusicInfo().albumIndex == AlbumManager.Uid);
+        }
     }
 }
