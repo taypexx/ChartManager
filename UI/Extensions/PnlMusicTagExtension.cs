@@ -69,7 +69,7 @@ internal static class PnlMusicTagSelectPatch
 
         if (cell.musicInfo.albumIndex == AlbumManager.Uid)
         {
-            var chart = MainManager.Charts[cell.musicInfo.uid];
+            var chart = MainManager.GetChart(cell.musicInfo.uid);
             UIManager.ChartWindow.Show(chart);
             return true;
         }

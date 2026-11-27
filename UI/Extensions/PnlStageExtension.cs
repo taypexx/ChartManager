@@ -63,7 +63,7 @@ internal static class PnlStageExtension
                 var musicInfo = GlobalDataBase.dbMusicTag.CurMusicInfo();
                 if (musicInfo.albumIndex != AlbumManager.Uid) return;
 
-                var chart = MainManager.Charts[musicInfo.uid];
+                var chart = MainManager.GetChart(musicInfo.uid);
                 UIManager.ChartWindow.Show(chart);
             }
         );

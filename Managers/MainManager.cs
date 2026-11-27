@@ -1,12 +1,25 @@
 ﻿using ChartManager.Data.Charts;
 using ChartManager.Static;
+using CustomAlbums.Data;
 using CustomAlbums.Managers;
+using Il2CppSystem.Threading.Tasks;
 
 namespace ChartManager.Managers;
 
 internal static class MainManager
 {
     internal static Dictionary<string, Chart> Charts = new();
+
+    internal static Chart GetChart(string uid)
+    {
+        if (Charts.ContainsKey(uid))
+        {
+            return Charts[uid];
+        }
+
+        var album = AlbumManager.GetByUid(uid);
+        return InitChart(album);
+    }
 
     internal static void RemoveChart(Chart chart)
     {
@@ -16,19 +29,27 @@ internal static class MainManager
         chart.Dispose();
     }
 
+    private static Chart InitChart(Album album)
+    {
+        try
+        {
+            var chart = new Chart(album);
+            Charts.Add(album.Uid, chart);
+
+            return chart;
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Failed to initialize the info for {album.AlbumName}: {ex}");
+            return null;
+        }
+    }
+
     internal static void InitCharts()
     {
-        foreach (var (albumName, album) in AlbumManager.LoadedAlbums)
+        foreach (var (_, album) in AlbumManager.LoadedAlbums)
         {
-            try
-            {
-                var info = new Chart(album);
-                Charts.Add(album.Uid, info);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Failed to initialize the info for {albumName}: {ex}");
-            }
+            InitChart(album);
         }
     }
 }
